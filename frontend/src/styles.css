@@ -1,0 +1,541 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans,
+    Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: Canvas;
+  color: CanvasText;
+}
+
+.navbar {
+  display: flex;
+  gap: 16px;
+  padding: 12px 24px;
+  background: color-mix(in oklab, CanvasText 5%, Canvas);
+  border-bottom: 1px solid color-mix(in oklab, CanvasText 12%, Canvas);
+}
+
+.navbar a {
+  color: inherit;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.navbar a:hover {
+  background: color-mix(in oklab, CanvasText 8%, Canvas);
+}
+
+.navbar a.active {
+  background: color-mix(in oklab, CanvasText 12%, Canvas);
+  font-weight: 600;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+.error {
+  font-weight: 600;
+}
+
+.card {
+  border: 1px solid color-mix(in oklab, CanvasText 15%, Canvas);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row--space {
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, CanvasText 18%, Canvas);
+  background: Canvas;
+  color: CanvasText;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, CanvasText 18%, Canvas);
+  background: color-mix(in oklab, CanvasText 7%, Canvas);
+  color: CanvasText;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+}
+
+button.danger {
+  border-color: color-mix(in oklab, CanvasText 55%, Canvas);
+}
+
+select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, CanvasText 18%, Canvas);
+  background: Canvas;
+  color: CanvasText;
+}
+
+.pre {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, CanvasText 15%, Canvas);
+  overflow: auto;
+}
+
+.list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.listItem {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, CanvasText 12%, Canvas);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table {
+  margin-top: 12px;
+  border-top: 1px solid color-mix(in oklab, CanvasText 15%, Canvas);
+}
+
+.thead,
+.trow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 8px;
+  padding: 10px 4px;
+  align-items: center;
+}
+
+.trow--5col,
+.thead--5col {
+  grid-template-columns: 2fr 1fr 1fr 2fr 1fr;
+}
+
+.trow--4col,
+.thead--4col {
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+.thead {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.trow {
+  border-top: 1px solid color-mix(in oklab, CanvasText 10%, Canvas);
+}
+
+.right {
+  text-align: right;
+}
+
+/* Receipt upload styles */
+.drop-zone {
+  margin-top: 16px;
+  padding: 32px;
+  border: 2px dashed color-mix(in oklab, CanvasText 20%, Canvas);
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.drop-zone:hover,
+.drop-zone--active {
+  border-color: color-mix(in oklab, CanvasText 40%, Canvas);
+  background: color-mix(in oklab, CanvasText 3%, Canvas);
+}
+
+.drop-zone--disabled {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.drop-zone__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.drop-zone__icon {
+  font-size: 48px;
+}
+
+/* Spinner */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid color-mix(in oklab, CanvasText 15%, Canvas);
+  border-top-color: color-mix(in oklab, CanvasText 60%, Canvas);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.receipt-preview {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+}
+
+.receipt-result {
+  margin-top: 24px;
+}
+
+.receipt-result h2 {
+  margin: 0;
+}
+
+.receipt-image-container {
+  margin: 16px 0;
+  text-align: center;
+}
+
+.receipt-total {
+  margin-top: 16px;
+  padding: 12px;
+  background: color-mix(in oklab, CanvasText 5%, Canvas);
+  border-radius: 8px;
+  text-align: right;
+  font-size: 1.1em;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: Canvas;
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin: 0 0 16px 0;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field span {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.form-field input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-field {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* Icon buttons */
+.btn-icon {
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 1em;
+  border-radius: 4px;
+}
+
+.btn-icon:hover {
+  background: color-mix(in oklab, CanvasText 10%, Canvas);
+}
+
+.btn-icon.danger:hover {
+  background: color-mix(in oklab, red 15%, Canvas);
+}
+
+/* Recipes */
+.recipes-result {
+  margin-top: 24px;
+}
+
+.recipes-result h2 {
+  margin: 0 0 16px 0;
+}
+
+.recipes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recipe-card {
+  background: color-mix(in oklab, CanvasText 3%, Canvas);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid color-mix(in oklab, CanvasText 10%, Canvas);
+}
+
+.recipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.recipe-title {
+  margin: 0;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.recipe-badge {
+  font-size: 0.75em;
+  padding: 4px 10px;
+  background: color-mix(in oklab, #4f46e5 15%, Canvas);
+  color: #4f46e5;
+  border-radius: 99px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.recipe-description {
+  margin: 0 0 16px 0;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+.recipe-ingredients h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.recipe-ingredients ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.recipe-ingredients li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: color-mix(in oklab, CanvasText 3%, Canvas);
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+.ingredient-name {
+  font-weight: 500;
+}
+
+.ingredient-quantity {
+  opacity: 0.8;
+}
+
+/* Recipe selection */
+.recipe-card {
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.recipe-card:hover:not(.disabled) {
+  border-color: color-mix(in oklab, #4f46e5 40%, Canvas);
+}
+
+.recipe-card:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+.recipe-card.selected {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px color-mix(in oklab, #4f46e5 20%, transparent);
+}
+
+.recipe-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.recipe-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recipe-select input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4f46e5;
+  cursor: pointer;
+}
+
+/* Confirm action */
+.confirm-action {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: color-mix(in oklab, CanvasText 3%, Canvas);
+  border-radius: 8px;
+}
+
+.confirm-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.confirm-btn:disabled {
+  background: color-mix(in oklab, #4f46e5 50%, Canvas);
+  cursor: not-allowed;
+}
+
+/* Success banner */
+.success-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: color-mix(in oklab, #22c55e 15%, Canvas);
+  border: 1px solid color-mix(in oklab, #22c55e 40%, Canvas);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.success-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.success-content strong {
+  color: #16a34a;
+}
+
+.success-content details {
+  margin-top: 8px;
+}
+
+.success-content summary {
+  cursor: pointer;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.inventory-updates {
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 0;
+  font-size: 0.85em;
+}
+
+.inventory-updates li {
+  padding: 4px 0;
+  display: flex;
+  gap: 8px;
+}
+
+.inventory-updates .used {
+  color: #dc2626;
+  font-weight: 500;
+}
+

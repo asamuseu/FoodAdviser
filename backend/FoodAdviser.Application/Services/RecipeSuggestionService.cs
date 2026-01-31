@@ -15,7 +15,7 @@ public class RecipeSuggestionService : IRecipeSuggestionService
 {
     private readonly IFoodItemRepository _foodItemRepository;
     private readonly IRecipeRepository _recipeRepository;
-    private readonly IOpenAiService _openAiService;
+    private readonly IAiRecipeServiceFactory _aiRecipeServiceFactory;
     private readonly IMapper _mapper;
     private readonly ILogger<RecipeSuggestionService> _logger;
     private readonly RecipeSuggestionOptions _options;
@@ -26,14 +26,14 @@ public class RecipeSuggestionService : IRecipeSuggestionService
     public RecipeSuggestionService(
         IFoodItemRepository foodItemRepository,
         IRecipeRepository recipeRepository,
-        IOpenAiService openAiService,
+        IAiRecipeServiceFactory aiRecipeServiceFactory,
         IMapper mapper,
         ILogger<RecipeSuggestionService> logger,
         IOptions<RecipeSuggestionOptions> options)
     {
         _foodItemRepository = foodItemRepository;
         _recipeRepository = recipeRepository;
-        _openAiService = openAiService;
+        _aiRecipeServiceFactory = aiRecipeServiceFactory;
         _mapper = mapper;
         _logger = logger;
         _options = options.Value;
@@ -61,9 +61,12 @@ public class RecipeSuggestionService : IRecipeSuggestionService
 
         _logger.LogInformation("Found {Count} available food items in inventory", availableItems.Count);
 
-        // Step 2: Call OpenAI to generate recipes
+        // Step 2: Get the configured AI service and generate recipes
+        var aiService = _aiRecipeServiceFactory.GetService();
+        _logger.LogInformation("Using AI provider: {Provider}", aiService.ProviderName);
+        
         var recipeCount = _options.DefaultRecipeCount;
-        var generatedRecipes = await _openAiService.GenerateRecipesAsync(
+        var generatedRecipes = await aiService.GenerateRecipesAsync(
             availableItems,
             dishType,
             numberOfPersons,
@@ -73,14 +76,14 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         if (generatedRecipes.Count == 0)
         {
             _logger.LogWarning(
-                "OpenAI could not generate any recipes for DishType={DishType} with available ingredients",
-                dishType);
+                "AI provider {Provider} could not generate any recipes for DishType={DishType} with available ingredients",
+                aiService.ProviderName, dishType);
             throw new InvalidOperationException(
                 $"No suitable recipes could be generated for {dishType} with the available ingredients. " +
                 "Try adding more ingredients to your inventory or selecting a different dish type.");
         }
 
-        _logger.LogInformation("OpenAI generated {Count} recipes", generatedRecipes.Count);
+        _logger.LogInformation("{Provider} generated {Count} recipes", aiService.ProviderName, generatedRecipes.Count);
 
         // Step 3: Save recipes to the database
         var savedRecipes = await _recipeRepository.AddRangeAsync(generatedRecipes, ct);

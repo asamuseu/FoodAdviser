@@ -14,11 +14,14 @@ namespace FoodAdviser.Infrastructure.Services;
 /// <summary>
 /// OpenAI service implementation for generating recipe suggestions.
 /// </summary>
-public class OpenAiService : IOpenAiService
+public class OpenAiService : IAiRecipeService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<OpenAiService> _logger;
     private readonly OpenAiOptions _options;
+    
+    /// <inheritdoc />
+    public string ProviderName => "OpenAI";
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -72,7 +75,7 @@ public class OpenAiService : IOpenAiService
                     Content = prompt
                 }
             },
-            Temperature = 0.7,
+            Temperature = 1,
             MaxTokens = 4000
         };
 
@@ -218,7 +221,7 @@ Remember: Return ONLY the JSON array, no explanations, no markdown, no code bloc
         [JsonPropertyName("temperature")]
         public double Temperature { get; set; }
 
-        [JsonPropertyName("max_tokens")]
+        [JsonPropertyName("max_completion_tokens")]
         public int MaxTokens { get; set; }
     }
 

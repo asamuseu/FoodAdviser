@@ -26,11 +26,88 @@ Clone the repository and open the solution file to begin.
 - FoodAdviser.Api.Tests: Integration tests (to be expanded)
 
 ## Run (Dev)
+
+### Prerequisites: PostgreSQL Database
+
+The application requires PostgreSQL to run. You have two options:
+
+#### Option 1: Docker Compose (Recommended)
+
+If you have Docker Desktop installed:
+
+```powershell
+cd "C:\AI training\FoodAdviser\backend"
+docker-compose up -d
 ```
-cd "C:\AI training\FoodAdviser\FoodAdviser.Api"
+
+This will start PostgreSQL on `localhost:5432` with the credentials configured in `appsettings.Development.json`.
+
+To stop PostgreSQL:
+```powershell
+docker-compose down
+```
+
+#### Option 2: Local PostgreSQL Installation
+
+Install PostgreSQL 15+ locally and create a database with these credentials:
+- Host: localhost
+- Port: 5432
+- Database: foodadviser
+- Username: foodadviser
+- Password: foodadviser_dev_pw
+
+### Running the Application
+
+```powershell
+cd "C:\AI training\FoodAdviser\backend\FoodAdviser.Api"
 dotnet run
 ```
 
+## API
+
+Base URLs (Development defaults from `FoodAdviser.Api/Properties/launchSettings.json`):
+
+- HTTP: `http://localhost:5288`
+- HTTPS: `https://localhost:7162`
+
+Swagger UI (Development only):
+
+- `https://localhost:7162/swagger`
+
+All API endpoints are under the `/api` prefix.
+
+Endpoints:
+
+- Inventory
+  - `GET /api/Inventory?page=1&pageSize=20`
+  - `GET /api/Inventory/{id}`
+  - `POST /api/Inventory`
+  - `PUT /api/Inventory/{id}`
+  - `DELETE /api/Inventory/{id}`
+
+- Receipts
+  - `POST /api/Receipts/upload`
+  - `GET /api/Receipts/recent`
+  - `POST /api/Receipts/analyze` (stub)
+
+- Recipes
+  - `POST /api/Recipes/generate`
+  - `POST /api/Recipes/confirm`
+  - `GET /api/Recipes/suggestions?max=10` (stub)
+
 ## Configuration
-- ConnectionStrings:Default uses SQLite file `foodadviser.db`.
-- AutoMapper registered via Application profile.
+
+### Database Connection
+- **Development**: Uses PostgreSQL (see connection string in `appsettings.Development.json`)
+- **Production**: Configure `ConnectionStrings:Default` in `appsettings.json` or environment variables
+
+### Connection String Parameters
+The application is configured with:
+- Timeout: 30 seconds
+- CommandTimeout: 30 seconds
+- Retry on failure: 5 attempts with exponential backoff (max 10 seconds delay)
+
+### Other Settings
+- AutoMapper registered via Application profile
+- Receipt analyzer configured via `ReceiptAnalyzer` section
+- OpenAI integration via `OpenAi` section

@@ -4,12 +4,13 @@ using FoodAdviser.Domain.Enums;
 namespace FoodAdviser.Application.Services;
 
 /// <summary>
-/// Service interface for OpenAI integration to generate recipe suggestions.
+/// Service interface for AI-powered recipe generation.
+/// This abstraction allows switching between different AI providers (OpenAI, DeepSeek, etc.).
 /// </summary>
-public interface IOpenAiService
+public interface IAiRecipeService
 {
     /// <summary>
-    /// Generates recipe suggestions based on available food items using OpenAI.
+    /// Generates recipe suggestions based on available food items using an AI service.
     /// </summary>
     /// <param name="availableItems">List of available food items with quantities.</param>
     /// <param name="dishType">The type of dish to generate.</param>
@@ -23,4 +24,9 @@ public interface IOpenAiService
         int numberOfPersons,
         int recipeCount,
         CancellationToken ct = default);
+    
+    /// <summary>
+    /// Gets the name of the AI provider.
+    /// </summary>
+    string ProviderName { get; }
 }

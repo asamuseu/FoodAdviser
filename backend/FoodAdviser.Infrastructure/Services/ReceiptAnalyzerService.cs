@@ -3,6 +3,8 @@ using FoodAdviser.Application.Services;
 using FoodAdviser.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Veryfi;
 
 namespace FoodAdviser.Infrastructure.Services;
@@ -39,15 +41,19 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
                     File_name = Path.GetFileName(imagePath),
                     File_data = Convert.ToBase64String(bytes)
                 };
+                
+                // var document = await api.ProcessDocumentAsync(
+                //     new DocumentUploadOptionsV7() {
+                //         File_name = "fileName.jpg",
+                //         File_data = Convert.ToBase64String(bytes),
+                //     }, cancellationToken);
+                
                 var documentResponse = await api.Documents2Async(request, cancellationToken: cancellationToken);
                 
-                var document = await api.ProcessDocumentAsync(
-                    new DocumentUploadOptionsV7() {
-                        File_name = "fileName.jpg",
-                        File_data = Convert.ToBase64String(bytes),
-                    }, cancellationToken);
+                var json = documentResponse.ToString();
+                var document =  JsonConvert.DeserializeObject<Document>(json, JsonSettings) ?? new Document();
                 
-                return MapToDomain(documentResponse);
+                return MapToDomain(document);
             }
             catch (OperationCanceledException)
             {
@@ -62,22 +68,30 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
         throw new InvalidOperationException("Analyzer retries exhausted");
     }
 
-    private static Receipt MapToDomain(object documentResponse)
+    private static Receipt MapToDomain(Document document)
     {
-        Document document = documentResponse as Document 
-            ?? throw new InvalidCastException("Failed to cast Veryfi response to Document");
+        if (document == null)
+        {
+            return null;
+        } 
         
         var items = new List<ReceiptLineItem>();
         if (document.Line_items != null)
         {
             foreach (var li in document.Line_items)
             {
+                if(li.Type != LineItemType.Food)
+                {
+                    continue;
+                }
+                
                 items.Add(new ReceiptLineItem
                 {
                     Id = Guid.NewGuid(),
                     Name = li.Description ?? li.Text ?? string.Empty,
                     Unit = li.Unit_of_measure ?? "pcs",
-                    Quantity = (decimal)li.Quantity
+                    Quantity = (decimal)li.Quantity,
+                    Price = (decimal)li.Price == 0 ? (decimal)li.Total : (decimal)li.Price
                 });
             }
         }
@@ -88,4 +102,17 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
             Items = items
         };
     }
+    
+    private static readonly JsonSerializerSettings JsonSettings = new()
+    {
+        NullValueHandling = NullValueHandling.Ignore,
+        MissingMemberHandling = MissingMemberHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.Ignore,
+
+        // Optional: ignore individual value conversion errors instead of throwing.
+        Error = (sender, args) =>
+        {
+            args.ErrorContext.Handled = true;
+        }
+    };
 }

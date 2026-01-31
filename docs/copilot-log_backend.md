@@ -1,0 +1,1 @@
+Add an initial migration and a startup-time Database.Migrate() so the schema is created automatically when the API starts
