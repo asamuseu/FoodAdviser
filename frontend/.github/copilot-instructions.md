@@ -67,3 +67,18 @@ When generating code
 Use Individual Files
   - Place each class, interface, service, DTO in its own file.
   - Organize by feature folders or conventional folders (pages,dtos, etc.).
+
+We want to redesign the FoodAdviser frontend UI.
+
+Design goals:
+ - Modern, clean, minimalistic UI
+ - Friendly and calm look suitable for a food / kitchen assistant app
+ - Focus on readability and simplicity
+ - Mobile-first, responsive layout
+
+Visual style:
+ - Soft rounded components
+ - Subtle shadows
+ - Spacious layout with clear visual hierarchy
+
+Do not create comprehensive summary file afeter changes.

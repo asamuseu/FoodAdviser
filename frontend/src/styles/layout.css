@@ -1,0 +1,214 @@
+/* ==========================================================================
+   Layout Styles - Container, Grid, Navigation
+   ========================================================================== */
+
+/* ==========================================================================
+   Container
+   ========================================================================== */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  animation: fadeInContent 0.3s ease-out;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ==========================================================================
+   Page Header
+   ========================================================================== */
+
+.page-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.page-header h1 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.page-header p {
+  margin: 0;
+}
+
+.header {
+  margin-bottom: var(--spacing-md);
+}
+
+/* ==========================================================================
+   Navigation Bar
+   ========================================================================== */
+
+.navbar {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  justify-content: space-between;
+}
+
+.navbar a {
+  color: var(--color-text);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  transition: background var(--transition-base),
+              color var(--transition-base),
+              transform var(--transition-fast);
+}
+
+.navbar a:hover {
+  background: var(--color-secondary-light);
+  color: var(--color-primary-dark);
+}
+
+.navbar a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.navbar a.active {
+  background: var(--color-primary);
+  color: white;
+  font-weight: var(--font-weight-semibold);
+}
+
+.navbar-links {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.navbar-auth {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.navbar-user {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.navbar-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background var(--transition-base), 
+              border-color var(--transition-base),
+              box-shadow var(--transition-base);
+  box-shadow: none;
+  min-height: 36px;
+}
+
+.navbar-btn:hover {
+  background: var(--color-secondary-light);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.navbar-btn-primary {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  font-weight: var(--font-weight-semibold);
+  transition: background var(--transition-base),
+              box-shadow var(--transition-base);
+  box-shadow: 0 1px 3px rgba(76, 175, 80, 0.2);
+  min-height: 36px;
+}
+
+.navbar-btn-primary:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.navbar-btn-primary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Flexbox Layout Utilities
+   ========================================================================== */
+
+.row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row--space {
+  justify-content: space-between;
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ==========================================================================
+   Table Layout
+   ========================================================================== */
+
+.table {
+  margin-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.thead,
+.trow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-xs);
+  align-items: center;
+}
+
+.trow--5col,
+.thead--5col {
+  grid-template-columns: 2fr 1fr 1fr 2fr 1fr;
+}
+
+.trow--4col,
+.thead--4col {
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+.thead {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background: var(--color-secondary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.trow {
+  border-top: 1px solid var(--color-border-light);
+  transition: background var(--transition-base);
+}
+
+.trow:hover {
+  background: var(--color-secondary-light);
+}

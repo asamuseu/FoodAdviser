@@ -91,95 +91,133 @@ export default function RecipesPage() {
 
   return (
     <div className="container">
-      <h1 className="header">Generate Recipes</h1>
-      <p className="muted">
-        Generate recipe suggestions based on your available inventory.
-      </p>
+      <div className="page-header">
+        <h1>Generate Recipes</h1>
+        <p className="muted">
+          Generate recipe suggestions based on your available inventory.
+        </p>
+      </div>
 
-      {/* Generation Form */}
-      <form onSubmit={onSubmit} className="card" style={{ marginTop: '16px' }}>
-        <div className="form-row">
-          <label className="form-field">
-            <span>Dish Type</span>
-            <select
-              value={form.dishType}
-              onChange={(e) => setForm({ ...form, dishType: Number(e.target.value) as DishType })}
+      {/* Generation Form - Input Section */}
+      <section className="recipe-generator-section">
+        <h2 className="section-title">Recipe Preferences</h2>
+        <form onSubmit={onSubmit} className="recipe-form">
+          <div className="form-row">
+            <div className="form-field">
+              <label htmlFor="dishType">
+                Dish Type <span className="required">*</span>
+              </label>
+              <select
+                id="dishType"
+                value={form.dishType}
+                onChange={(e) => setForm({ ...form, dishType: Number(e.target.value) as DishType })}
+                disabled={state.status === 'loading'}
+              >
+                {Object.entries(dishTypeLabels).map(([value, label]) => (
+                  <option key={value} value={value} disabled={Number(value) === DishType.Undefined}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="numberOfPersons">
+                Number of Persons <span className="required">*</span>
+              </label>
+              <input
+                id="numberOfPersons"
+                type="number"
+                value={form.numberOfPersons}
+                onChange={(e) => setForm({ ...form, numberOfPersons: parseInt(e.target.value) || 1 })}
+                min="1"
+                max="100"
+                placeholder="2"
+                disabled={state.status === 'loading'}
+              />
+              <span className="help-text">Between 1 and 100 persons</span>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            {state.status === 'success' && (
+              <button type="button" onClick={onReset} className="secondary">
+                New Search
+              </button>
+            )}
+            <button 
+              type="submit" 
+              className={state.status === 'loading' ? 'loading' : ''}
               disabled={state.status === 'loading'}
             >
-              {Object.entries(dishTypeLabels).map(([value, label]) => (
-                <option key={value} value={value} disabled={Number(value) === DishType.Undefined}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="form-field">
-            <span>Number of Persons</span>
-            <input
-              type="number"
-              value={form.numberOfPersons}
-              onChange={(e) => setForm({ ...form, numberOfPersons: parseInt(e.target.value) || 1 })}
-              min="1"
-              max="100"
-              disabled={state.status === 'loading'}
-            />
-          </label>
-        </div>
-
-        <div className="form-actions" style={{ marginTop: '16px' }}>
-          {state.status === 'success' && (
-            <button type="button" onClick={onReset} className="secondary">
-              Start Over
+              {state.status === 'loading' ? 'Generating...' : 'Generate Recipes'}
             </button>
-          )}
-          <button type="submit" disabled={state.status === 'loading'}>
-            {state.status === 'loading' ? 'Generating…' : 'Generate Recipes'}
-          </button>
-        </div>
-      </form>
+          </div>
+        </form>
+
+        {/* Error state in input section */}
+        {state.status === 'error' && (
+          <div className="recipe-error">
+            {state.message}
+          </div>
+        )}
+      </section>
 
       {/* Loading state */}
       {state.status === 'loading' && (
-        <div className="loading-container">
-          <div className="spinner" />
-          <p className="muted">Generating recipes based on your inventory…</p>
-        </div>
+        <section className="recipe-loading-section">
+          <div className="loading-content">
+            <div className="spinner" />
+            <p>Generating recipes based on your inventory...</p>
+          </div>
+        </section>
       )}
 
-      {/* Error state */}
-      {state.status === 'error' && (
-        <p className="error" style={{ marginTop: '16px' }}>
-          Error: {state.message}
-        </p>
-      )}
-
-      {/* Success state - show recipes */}
+      {/* Results Section */}
       {state.status === 'success' && (
-        <div className="recipes-result">
-          <h2>{state.recipes.length} Recipe(s) Found</h2>
+        <section className="recipe-results-section">
+          <div className="results-header">
+            <div>
+              <h2 className="section-title">
+                {state.recipes.length === 0 ? 'No Recipes Found' : `${state.recipes.length} Recipe${state.recipes.length > 1 ? 's' : ''} Found`}
+              </h2>
+              {state.recipes.length > 0 && (
+                <p className="muted">
+                  Select a recipe to update your inventory when you start cooking
+                </p>
+              )}
+            </div>
+          </div>
 
-          {/* Success message after confirmation */}
+          {/* Success message after confirmation - stays visible with recipes */}
           {confirmState.status === 'success' && (
-            <div className="success-banner">
+            <div className="recipe-success-banner">
               <div className="success-content">
-                <strong>✓ Recipe confirmed!</strong>
-                <span>{confirmState.response.message}</span>
+                <div className="success-header">
+                  <span className="success-icon">✓</span>
+                  <strong>Recipe Confirmed!</strong>
+                </div>
+                <p>{confirmState.response.message}</p>
                 {confirmState.response.inventoryUpdates.length > 0 && (
-                  <details>
-                    <summary>Inventory updated ({confirmState.response.inventoryUpdates.length} items)</summary>
+                  <details className="inventory-details">
+                    <summary>
+                      View inventory updates ({confirmState.response.inventoryUpdates.length} item{confirmState.response.inventoryUpdates.length > 1 ? 's' : ''})
+                    </summary>
                     <ul className="inventory-updates">
                       {confirmState.response.inventoryUpdates.map((update, idx) => (
                         <li key={idx}>
-                          {update.productName}: {update.previousQuantity} → {update.newQuantity} {update.unit}
-                          <span className="used">(-{update.usedQuantity})</span>
+                          <span className="update-item">{update.productName}</span>
+                          <span className="update-change">
+                            {update.previousQuantity} → {update.newQuantity} {update.unit}
+                            <span className="used"> (-{update.usedQuantity})</span>
+                          </span>
                         </li>
                       ))}
                     </ul>
                   </details>
                 )}
               </div>
-              <button className="btn-icon" onClick={dismissSuccessMessage} title="Dismiss">
+              <button className="btn-icon" onClick={dismissSuccessMessage} title="Dismiss" aria-label="Dismiss success message">
                 ✕
               </button>
             </div>
@@ -187,51 +225,56 @@ export default function RecipesPage() {
 
           {/* Confirmation error */}
           {confirmState.status === 'error' && (
-            <p className="error">
-              Confirmation error: {confirmState.message}
-            </p>
+            <div className="recipe-error">
+              {confirmState.message}
+            </div>
           )}
 
           {state.recipes.length === 0 ? (
-            <p className="muted">
-              No recipes could be generated with your current inventory. Try adding more products!
-            </p>
+            <div className="empty-results">
+              <p>No recipes could be generated with your current inventory.</p>
+              <p className="muted">Try adding more products to your inventory or selecting a different dish type.</p>
+            </div>
           ) : (
             <>
-              <p className="muted" style={{ marginBottom: '12px' }}>
-                Select a recipe and click "Confirm Cooking" to update your inventory.
-              </p>
-
-              {/* Confirm button */}
-              <div className="confirm-action">
+              {/* Sticky Confirmation Action Bar */}
+              <div className="recipe-confirmation-bar">
+                <div className="confirmation-info">
+                  {selectedRecipeId ? (
+                    <>
+                      <span className="selected-label">Selected Recipe:</span>
+                      <span className="selected-recipe">
+                        {state.recipes.find(r => r.id === selectedRecipeId)?.title}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="muted">Select a recipe below to confirm cooking</span>
+                  )}
+                </div>
                 <button
                   onClick={onConfirmCooking}
                   disabled={!selectedRecipeId || confirmState.status === 'confirming'}
-                  className="confirm-btn"
+                  className={`confirm-btn ${confirmState.status === 'confirming' ? 'loading' : ''}`}
                 >
-                  {confirmState.status === 'confirming' ? 'Confirming…' : 'Confirm Cooking'}
+                  {confirmState.status === 'confirming' ? 'Confirming...' : 'Confirm & Start Cooking'}
                 </button>
-                {selectedRecipeId && (
-                  <span className="muted">
-                    Selected: {state.recipes.find(r => r.id === selectedRecipeId)?.title}
-                  </span>
-                )}
               </div>
 
-              <div className="recipes-list">
+              {/* Recipe Cards Grid */}
+              <div className="recipes-grid">
                 {state.recipes.map((recipe) => (
                   <RecipeCard
                     key={recipe.id}
                     recipe={recipe}
                     isSelected={recipe.id === selectedRecipeId}
-                    onSelect={() => setSelectedRecipeId(recipe.id)}
+                    onSelect={() => setSelectedRecipeId(recipe.id === selectedRecipeId ? null : recipe.id)}
                     disabled={confirmState.status === 'confirming'}
                   />
                 ))}
               </div>
             </>
           )}
-        </div>
+        </section>
       )}
     </div>
   );
@@ -251,6 +294,7 @@ function RecipeCard({ recipe, isSelected, onSelect, disabled }: RecipeCardProps)
       onClick={disabled ? undefined : onSelect}
       role="button"
       tabIndex={disabled ? -1 : 0}
+      aria-pressed={isSelected}
       onKeyDown={(e) => {
         if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
@@ -258,31 +302,35 @@ function RecipeCard({ recipe, isSelected, onSelect, disabled }: RecipeCardProps)
         }
       }}
     >
-      <div className="recipe-header">
-        <div className="recipe-select">
-          <input
-            type="radio"
-            checked={isSelected}
-            onChange={onSelect}
-            disabled={disabled}
-            onClick={(e) => e.stopPropagation()}
-          />
-          <h3 className="recipe-title">{recipe.title}</h3>
+      <div className="recipe-card-header">
+        <input
+          type="radio"
+          className="recipe-card-radio"
+          checked={isSelected}
+          onChange={onSelect}
+          disabled={disabled}
+          onClick={(e) => e.stopPropagation()}
+          aria-label={`Select ${recipe.title}`}
+        />
+        <div>
+          <h3 className="recipe-card-title">{recipe.title}</h3>
+          <div className="recipe-card-meta">
+            <span className="recipe-badge">{dishTypeLabels[recipe.dishType]}</span>
+            <span className="recipe-badge">{recipe.ingredients.length} ingredients</span>
+          </div>
         </div>
-        <span className="recipe-badge">{dishTypeLabels[recipe.dishType]}</span>
       </div>
 
-      <p className="recipe-description">{recipe.description}</p>
+      {recipe.description && (
+        <p className="recipe-description">{recipe.description}</p>
+      )}
 
       <div className="recipe-ingredients">
         <h4>Ingredients</h4>
         <ul>
           {recipe.ingredients.map((ingredient: IngredientDto, index: number) => (
             <li key={index}>
-              <span className="ingredient-name">{ingredient.name}</span>
-              <span className="ingredient-quantity">
-                {ingredient.quantity} {ingredient.unit}
-              </span>
+              {ingredient.name}: {ingredient.quantity} {ingredient.unit}
             </li>
           ))}
         </ul>

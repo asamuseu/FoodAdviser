@@ -1,0 +1,19 @@
+/* ==========================================================================
+   FoodAdviser - Main Stylesheet Index
+   Imports all modular CSS files in the correct order
+   ========================================================================== */
+
+/* Base styles - variables, reset, typography, animations */
+@import './base.css';
+
+/* Layout styles - container, navigation, grids */
+@import './layout.css';
+
+/* Component styles - buttons, forms, cards, modals */
+@import './components.css';
+
+/* Page-specific styles - recipes, auth, receipts */
+@import './pages.css';
+
+/* Utility classes - helpers and text utilities */
+@import './utilities.css';
