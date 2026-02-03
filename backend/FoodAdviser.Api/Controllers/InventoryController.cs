@@ -1,21 +1,28 @@
 using FoodAdviser.Application.DTOs.Inventory;
+using FoodAdviser.Application.Services;
 using FoodAdviser.Domain.Entities;
 using FoodAdviser.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodAdviser.Api.Controllers;
 
 /// <summary>
 /// Manages food inventory items.
+/// All operations are scoped to the authenticated user.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InventoryController : ControllerBase
 {
     private readonly IFoodItemRepository _repo;
-    public InventoryController(IFoodItemRepository repo)
+    private readonly ICurrentUserService _currentUserService;
+    
+    public InventoryController(IFoodItemRepository repo, ICurrentUserService currentUserService)
     {
         _repo = repo;
+        _currentUserService = currentUserService;
     }
 
     /// <summary>Gets a paginated list of food items.</summary>
@@ -26,7 +33,9 @@ public class InventoryController : ControllerBase
     {
         if (page <= 0 || pageSize <= 0)
             return BadRequest(ProblemDetailsFactory.CreateProblemDetails(HttpContext, StatusCodes.Status400BadRequest, detail: "page and pageSize must be positive"));
-        var items = await _repo.GetPagedAsync(page, pageSize, ct);
+        
+        var userId = _currentUserService.GetRequiredUserId();
+        var items = await _repo.GetPagedAsync(page, pageSize, userId, ct);
         var result = items.Select(MapToDto).ToList();
         return Ok(result);
     }
@@ -35,7 +44,8 @@ public class InventoryController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<FoodItemDto>> GetById(Guid id, CancellationToken ct)
     {
-        var item = await _repo.GetByIdAsync(id, ct);
+        var userId = _currentUserService.GetRequiredUserId();
+        var item = await _repo.GetByIdAsync(id, userId, ct);
         if (item is null) return NotFound();
         return Ok(MapToDto(item));
     }
@@ -45,7 +55,9 @@ public class InventoryController : ControllerBase
     public async Task<ActionResult<FoodItemDto>> Create([FromBody] CreateFoodItemDto dto, CancellationToken ct)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
-        var entity = MapFromCreate(dto);
+        
+        var userId = _currentUserService.GetRequiredUserId();
+        var entity = MapFromCreate(dto, userId);
         entity.Id = Guid.NewGuid();
         var created = await _repo.AddAsync(entity, ct);
         var result = MapToDto(created);
@@ -57,7 +69,14 @@ public class InventoryController : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] FoodItemDto dto, CancellationToken ct)
     {
         if (id != dto.Id) return BadRequest(ProblemDetailsFactory.CreateProblemDetails(HttpContext, StatusCodes.Status400BadRequest, detail: "Id mismatch"));
-        var entity = MapFromDto(dto);
+        
+        var userId = _currentUserService.GetRequiredUserId();
+        
+        // Verify the item belongs to the user
+        var existing = await _repo.GetByIdAsync(id, userId, ct);
+        if (existing is null) return NotFound();
+        
+        var entity = MapFromDto(dto, userId);
         await _repo.UpdateAsync(entity, ct);
         return NoContent();
     }
@@ -66,7 +85,8 @@ public class InventoryController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        await _repo.DeleteAsync(id, ct);
+        var userId = _currentUserService.GetRequiredUserId();
+        await _repo.DeleteAsync(id, userId, ct);
         return NoContent();
     }
 
@@ -79,17 +99,19 @@ public class InventoryController : ControllerBase
         ExpiresAt = item.ExpiresAt
     };
 
-    private static FoodItem MapFromDto(FoodItemDto dto) => new()
+    private static FoodItem MapFromDto(FoodItemDto dto, Guid userId) => new()
     {
         Id = dto.Id,
+        UserId = userId,
         Name = dto.Name,
         Quantity = dto.Quantity,
         Unit = dto.Unit,
         ExpiresAt = dto.ExpiresAt
     };
 
-    private static FoodItem MapFromCreate(CreateFoodItemDto dto) => new()
+    private static FoodItem MapFromCreate(CreateFoodItemDto dto, Guid userId) => new()
     {
+        UserId = userId,
         Name = dto.Name,
         Quantity = dto.Quantity,
         Unit = dto.Unit,

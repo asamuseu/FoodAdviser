@@ -1,5 +1,6 @@
 using FoodAdviser.Application.DTOs.Receipts;
 using FoodAdviser.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FoodAdviser.Api.DTOs.Receipts;
 
@@ -7,9 +8,11 @@ namespace FoodAdviser.Api.Controllers;
 
 /// <summary>
 /// Handles receipt parsing and retrieval.
+/// All operations are scoped to the authenticated user.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ReceiptsController : ControllerBase
 {
     private readonly IReceiptService _receiptService;

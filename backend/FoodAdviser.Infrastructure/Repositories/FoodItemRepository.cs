@@ -7,22 +7,25 @@ namespace FoodAdviser.Infrastructure.Repositories;
 
 /// <summary>
 /// EF Core implementation of IFoodItemRepository.
+/// All queries are scoped to the specified user.
 /// </summary>
 public class FoodItemRepository : IFoodItemRepository
 {
     private readonly FoodAdviserDbContext _db;
     public FoodItemRepository(FoodAdviserDbContext db) => _db = db;
 
-    public async Task<FoodItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        => await _db.FoodItems.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
+    public async Task<FoodItem?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct = default)
+        => await _db.FoodItems.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, ct);
 
     /// <inheritdoc />
-    public async Task<FoodItem?> GetByNameAsync(string name, CancellationToken ct = default)
+    public async Task<FoodItem?> GetByNameAsync(string name, Guid userId, CancellationToken ct = default)
         => await _db.FoodItems.FirstOrDefaultAsync(
-            x => x.Name.ToLower() == name.ToLower(), ct);
+            x => x.Name.ToLower() == name.ToLower() && x.UserId == userId, ct);
 
-    public async Task<IReadOnlyList<FoodItem>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FoodItem>> GetPagedAsync(int page, int pageSize, Guid userId, CancellationToken ct = default)
         => await _db.FoodItems.AsNoTracking()
+            .Where(x => x.UserId == userId)
             .OrderBy(x => x.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -41,28 +44,29 @@ public class FoodItemRepository : IFoodItemRepository
         await _db.SaveChangesAsync(ct);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    public async Task DeleteAsync(Guid id, Guid userId, CancellationToken ct = default)
     {
-        var entity = await _db.FoodItems.FindAsync(new object[] { id }, ct);
+        var entity = await _db.FoodItems
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, ct);
         if (entity is null) return;
         _db.FoodItems.Remove(entity);
         await _db.SaveChangesAsync(ct);
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FoodItem>> GetAvailableItemsAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<FoodItem>> GetAvailableItemsAsync(Guid userId, CancellationToken ct = default)
         => await _db.FoodItems
             .AsNoTracking()
-            .Where(x => x.Quantity > 0)
+            .Where(x => x.UserId == userId && x.Quantity > 0)
             .OrderBy(x => x.Name)
             .ToListAsync(ct);
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FoodItem>> GetByNamesAsync(IEnumerable<string> names, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FoodItem>> GetByNamesAsync(IEnumerable<string> names, Guid userId, CancellationToken ct = default)
     {
         var nameList = names.Select(n => n.ToLower()).ToList();
         return await _db.FoodItems
-            .Where(x => nameList.Contains(x.Name.ToLower()))
+            .Where(x => x.UserId == userId && nameList.Contains(x.Name.ToLower()))
             .ToListAsync(ct);
     }
 

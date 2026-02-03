@@ -10,12 +10,14 @@ namespace FoodAdviser.Application.Services;
 
 /// <summary>
 /// Service for generating recipe suggestions based on available inventory.
+/// All operations are scoped to the current authenticated user.
 /// </summary>
 public class RecipeSuggestionService : IRecipeSuggestionService
 {
     private readonly IFoodItemRepository _foodItemRepository;
     private readonly IRecipeRepository _recipeRepository;
     private readonly IAiRecipeServiceFactory _aiRecipeServiceFactory;
+    private readonly ICurrentUserService _currentUserService;
     private readonly IMapper _mapper;
     private readonly ILogger<RecipeSuggestionService> _logger;
     private readonly RecipeSuggestionOptions _options;
@@ -27,6 +29,7 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         IFoodItemRepository foodItemRepository,
         IRecipeRepository recipeRepository,
         IAiRecipeServiceFactory aiRecipeServiceFactory,
+        ICurrentUserService currentUserService,
         IMapper mapper,
         ILogger<RecipeSuggestionService> logger,
         IOptions<RecipeSuggestionOptions> options)
@@ -34,6 +37,7 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         _foodItemRepository = foodItemRepository;
         _recipeRepository = recipeRepository;
         _aiRecipeServiceFactory = aiRecipeServiceFactory;
+        _currentUserService = currentUserService;
         _mapper = mapper;
         _logger = logger;
         _options = options.Value;
@@ -45,21 +49,23 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         int numberOfPersons,
         CancellationToken ct = default)
     {
+        var userId = _currentUserService.GetRequiredUserId();
+        
         _logger.LogInformation(
-            "Generating recipe suggestions for DishType={DishType}, NumberOfPersons={NumberOfPersons}",
-            dishType, numberOfPersons);
+            "User {UserId} generating recipe suggestions for DishType={DishType}, NumberOfPersons={NumberOfPersons}",
+            userId, dishType, numberOfPersons);
 
-        // Step 1: Retrieve all available products with quantity > 0
-        var availableItems = await _foodItemRepository.GetAvailableItemsAsync(ct);
+        // Step 1: Retrieve all available products with quantity > 0 for this user
+        var availableItems = await _foodItemRepository.GetAvailableItemsAsync(userId, ct);
 
         if (availableItems.Count == 0)
         {
-            _logger.LogWarning("No available food items found in inventory");
+            _logger.LogWarning("No available food items found in inventory for user {UserId}", userId);
             throw new InvalidOperationException(
                 "No suitable recipes could be generated. Your inventory is empty or all items have zero quantity.");
         }
 
-        _logger.LogInformation("Found {Count} available food items in inventory", availableItems.Count);
+        _logger.LogInformation("Found {Count} available food items in inventory for user {UserId}", availableItems.Count, userId);
 
         // Step 2: Get the configured AI service and generate recipes
         var aiService = _aiRecipeServiceFactory.GetService();
@@ -85,10 +91,15 @@ public class RecipeSuggestionService : IRecipeSuggestionService
 
         _logger.LogInformation("{Provider} generated {Count} recipes", aiService.ProviderName, generatedRecipes.Count);
 
-        // Step 3: Save recipes to the database
+        // Step 3: Set user ID on each recipe and save to the database
+        foreach (var recipe in generatedRecipes)
+        {
+            recipe.UserId = userId;
+        }
+        
         var savedRecipes = await _recipeRepository.AddRangeAsync(generatedRecipes, ct);
 
-        _logger.LogInformation("Saved {Count} recipes to database", savedRecipes.Count);
+        _logger.LogInformation("Saved {Count} recipes to database for user {UserId}", savedRecipes.Count, userId);
 
         // Step 4: Map to DTOs and return
         var recipeDtos = _mapper.Map<List<RecipeDto>>(savedRecipes);

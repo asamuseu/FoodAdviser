@@ -7,6 +7,7 @@ namespace FoodAdviser.Infrastructure.Repositories;
 
 /// <summary>
 /// EF Core implementation of IRecipeRepository.
+/// All queries are scoped to the specified user.
 /// </summary>
 public class RecipeRepository : IRecipeRepository
 {
@@ -18,11 +19,11 @@ public class RecipeRepository : IRecipeRepository
     public RecipeRepository(FoodAdviserDbContext db) => _db = db;
 
     /// <inheritdoc />
-    public async Task<Recipe?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Recipe?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct = default)
         => await _db.Recipes
             .AsNoTracking()
             .Include(r => r.Ingredients)
-            .FirstOrDefaultAsync(x => x.Id == id, ct);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, ct);
 
     /// <inheritdoc />
     public async Task<Recipe> AddAsync(Recipe recipe, CancellationToken ct = default)
@@ -33,10 +34,11 @@ public class RecipeRepository : IRecipeRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Recipe>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<Recipe>> GetAllAsync(Guid userId, CancellationToken ct = default)
         => await _db.Recipes
             .AsNoTracking()
             .Include(r => r.Ingredients)
+            .Where(r => r.UserId == userId)
             .OrderBy(r => r.Title)
             .ToListAsync(ct);
 
@@ -52,13 +54,13 @@ public class RecipeRepository : IRecipeRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Recipe>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Recipe>> GetByIdsAsync(IEnumerable<Guid> ids, Guid userId, CancellationToken ct = default)
     {
         var idList = ids.ToList();
         return await _db.Recipes
             .AsNoTracking()
             .Include(r => r.Ingredients)
-            .Where(r => idList.Contains(r.Id))
+            .Where(r => r.UserId == userId && idList.Contains(r.Id))
             .ToListAsync(ct);
     }
 }

@@ -4,6 +4,16 @@ export type ApiError = {
   details?: unknown;
 };
 
+/** Storage key for the access token - must match AuthContext */
+const ACCESS_TOKEN_KEY = 'foodadviser_access_token';
+
+/**
+ * Gets the stored access token from session storage.
+ */
+function getAccessToken(): string | null {
+  return sessionStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
 function joinUrl(baseUrl: string, path: string): string {
   const trimmedBase = baseUrl.replace(/\/+$/, '');
   const trimmedPath = path.replace(/^\/+/, '');
@@ -44,11 +54,23 @@ export class ApiClient {
       headers?: Record<string, string>;
       body?: BodyInit | null;
       signal?: AbortSignal;
+      skipAuth?: boolean;
     },
   ): Promise<T> {
+    // Build headers with optional Authorization
+    const headers: Record<string, string> = { ...options?.headers };
+
+    // Add Authorization header if token exists and skipAuth is not set
+    if (!options?.skipAuth) {
+      const token = getAccessToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
     const response = await fetch(joinUrl(this.baseUrl, path), {
       method: options?.method ?? 'GET',
-      headers: options?.headers,
+      headers,
       body: options?.body ?? null,
       signal: options?.signal,
     });

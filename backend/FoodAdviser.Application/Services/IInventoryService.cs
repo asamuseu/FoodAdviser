@@ -4,6 +4,7 @@ namespace FoodAdviser.Application.Services;
 
 /// <summary>
 /// Service interface for managing user inventory operations.
+/// All operations are scoped to the current authenticated user.
 /// </summary>
 public interface IInventoryService
 {
@@ -14,6 +15,7 @@ public interface IInventoryService
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A response containing the result of the confirmation and inventory updates.</returns>
     /// <exception cref="InvalidOperationException">Thrown when recipes are not found or inventory is insufficient.</exception>
+    /// <exception cref="UnauthorizedAccessException">Thrown when user is not authenticated.</exception>
     Task<ConfirmRecipesResponseDto> ConfirmRecipesAsync(
         IReadOnlyList<Guid> recipeIds,
         CancellationToken ct = default);

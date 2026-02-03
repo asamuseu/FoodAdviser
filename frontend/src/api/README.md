@@ -21,3 +21,7 @@ Endpoints:
   - `POST /api/Recipes/generate`
   - `POST /api/Recipes/confirm`
   - `GET /api/Recipes/suggestions?max=10` (stub)
+
+- Auth
+- `POST /api/Auth/register`
+- `POST /api/Auth/login`

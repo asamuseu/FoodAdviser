@@ -1,14 +1,17 @@
 using FoodAdviser.Application.DTOs.Recipes;
 using FoodAdviser.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodAdviser.Api.Controllers;
 
 /// <summary>
 /// Provides recipe suggestions based on available inventory.
+/// All operations are scoped to the authenticated user.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class RecipesController : ControllerBase
 {
     private readonly IRecipeSuggestionService _recipeSuggestionService;

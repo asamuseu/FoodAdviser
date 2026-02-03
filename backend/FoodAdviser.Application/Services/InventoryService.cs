@@ -6,11 +6,13 @@ namespace FoodAdviser.Application.Services;
 
 /// <summary>
 /// Service for managing user inventory operations including recipe confirmation.
+/// All operations are scoped to the current authenticated user.
 /// </summary>
 public class InventoryService : IInventoryService
 {
     private readonly IRecipeRepository _recipeRepository;
     private readonly IFoodItemRepository _foodItemRepository;
+    private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<InventoryService> _logger;
 
     /// <summary>
@@ -19,10 +21,12 @@ public class InventoryService : IInventoryService
     public InventoryService(
         IRecipeRepository recipeRepository,
         IFoodItemRepository foodItemRepository,
+        ICurrentUserService currentUserService,
         ILogger<InventoryService> logger)
     {
         _recipeRepository = recipeRepository;
         _foodItemRepository = foodItemRepository;
+        _currentUserService = currentUserService;
         _logger = logger;
     }
 
@@ -31,10 +35,11 @@ public class InventoryService : IInventoryService
         IReadOnlyList<Guid> recipeIds,
         CancellationToken ct = default)
     {
-        _logger.LogInformation("Confirming {Count} recipes", recipeIds.Count);
+        var userId = _currentUserService.GetRequiredUserId();
+        _logger.LogInformation("User {UserId} confirming {Count} recipes", userId, recipeIds.Count);
 
-        // Step 1: Retrieve the recipes from the database
-        var recipes = await _recipeRepository.GetByIdsAsync(recipeIds, ct);
+        // Step 1: Retrieve the recipes from the database for this user
+        var recipes = await _recipeRepository.GetByIdsAsync(recipeIds, userId, ct);
 
         if (recipes.Count == 0)
         {
@@ -71,9 +76,9 @@ public class InventoryService : IInventoryService
 
         _logger.LogInformation("Aggregated {Count} unique ingredients from recipes", ingredientUsage.Count);
 
-        // Step 3: Retrieve the corresponding food items from inventory
+        // Step 3: Retrieve the corresponding food items from inventory for this user
         var ingredientNames = ingredientUsage.Keys.ToList();
-        var foodItems = await _foodItemRepository.GetByNamesAsync(ingredientNames, ct);
+        var foodItems = await _foodItemRepository.GetByNamesAsync(ingredientNames, userId, ct);
 
         // Create a lookup for easy access
         var foodItemLookup = foodItems.ToDictionary(f => f.Name, f => f, StringComparer.OrdinalIgnoreCase);

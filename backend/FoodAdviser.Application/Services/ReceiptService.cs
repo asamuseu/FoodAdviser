@@ -11,12 +11,14 @@ namespace FoodAdviser.Application.Services;
 
 /// <summary>
 /// Service implementation for receipt operations.
+/// All operations are scoped to the current authenticated user.
 /// </summary>
 public class ReceiptService : IReceiptService
 {
     private readonly IReceiptAnalyzerService _analyzer;
     private readonly IReceiptRepository _repository;
     private readonly IFoodItemRepository _foodItemRepository;
+    private readonly ICurrentUserService _currentUserService;
     private readonly IMapper _mapper;
     private readonly StorageOptions _storageOptions;
     private readonly ILogger<ReceiptService> _logger;
@@ -25,6 +27,7 @@ public class ReceiptService : IReceiptService
         IReceiptAnalyzerService analyzer,
         IReceiptRepository repository,
         IFoodItemRepository foodItemRepository,
+        ICurrentUserService currentUserService,
         IMapper mapper,
         IOptions<StorageOptions> storageOptions,
         ILogger<ReceiptService> logger)
@@ -32,6 +35,7 @@ public class ReceiptService : IReceiptService
         _analyzer = analyzer;
         _repository = repository;
         _foodItemRepository = foodItemRepository;
+        _currentUserService = currentUserService;
         _mapper = mapper;
         _storageOptions = storageOptions.Value;
         _logger = logger;
@@ -39,6 +43,8 @@ public class ReceiptService : IReceiptService
 
     public async Task<ReceiptDto> UploadAndAnalyzeReceiptAsync(IFormFile file, CancellationToken cancellationToken = default)
     {
+        var userId = _currentUserService.GetRequiredUserId();
+        
         var baseTemp = _storageOptions.ReceiptTempPath ?? Path.Combine(Path.GetTempPath(), "FoodAdviser", "receipts");
         Directory.CreateDirectory(baseTemp);
         var ext = Path.GetExtension(file.FileName ?? string.Empty);
@@ -51,16 +57,19 @@ public class ReceiptService : IReceiptService
                 await file.CopyToAsync(fs, cancellationToken);
             }
 
-            _logger.LogInformation("Analyzing receipt from file: {FileName}", file.FileName);
+            _logger.LogInformation("User {UserId} analyzing receipt from file: {FileName}", userId, file.FileName);
             var receipt = await _analyzer.AnalyzeAsync(tempFile, cancellationToken);
             
+            // Set the user ID on the receipt
+            receipt.UserId = userId;
+            
             var added = await _repository.AddAsync(receipt, cancellationToken);
-            _logger.LogInformation("Receipt {ReceiptId} successfully persisted", added.Id);
+            _logger.LogInformation("Receipt {ReceiptId} successfully persisted for user {UserId}", added.Id, userId);
             
             var receiptDto = _mapper.Map<ReceiptDto>(added);
             
             // Update food inventory based on receipt items
-            await UpdateFoodInventoryAsync(receiptDto.Items, cancellationToken);
+            await UpdateFoodInventoryAsync(receiptDto.Items, userId, cancellationToken);
             
             return receiptDto;
         }
@@ -88,8 +97,9 @@ public class ReceiptService : IReceiptService
 
     public async Task<IReadOnlyList<ReceiptDto>> GetRecentReceiptsAsync(int count, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Retrieving {Count} recent receipts", count);
-        var receipts = await _repository.GetRecentAsync(count, cancellationToken);
+        var userId = _currentUserService.GetRequiredUserId();
+        _logger.LogInformation("User {UserId} retrieving {Count} recent receipts", userId, count);
+        var receipts = await _repository.GetRecentAsync(count, userId, cancellationToken);
         return receipts.Select(r => _mapper.Map<ReceiptDto>(r)).ToList();
     }
 
@@ -98,14 +108,15 @@ public class ReceiptService : IReceiptService
     /// Adds new items or increments quantity for existing items.
     /// </summary>
     /// <param name="items">The receipt line items to process.</param>
+    /// <param name="userId">The user ID to scope the inventory operations.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    private async Task UpdateFoodInventoryAsync(IReadOnlyList<ReceiptLineItemDto> items, CancellationToken cancellationToken)
+    private async Task UpdateFoodInventoryAsync(IReadOnlyList<ReceiptLineItemDto> items, Guid userId, CancellationToken cancellationToken)
     {
         foreach (var item in items)
         {
             try
             {
-                var existingFoodItem = await _foodItemRepository.GetByNameAsync(item.Name, cancellationToken);
+                var existingFoodItem = await _foodItemRepository.GetByNameAsync(item.Name, userId, cancellationToken);
 
                 if (existingFoodItem is not null)
                 {
@@ -120,8 +131,9 @@ public class ReceiptService : IReceiptService
                     
                     await _foodItemRepository.UpdateAsync(existingFoodItem, cancellationToken);
                     _logger.LogInformation(
-                        "Updated food item '{Name}' quantity. New quantity: {Quantity}",
+                        "Updated food item '{Name}' quantity for user {UserId}. New quantity: {Quantity}",
                         existingFoodItem.Name,
+                        userId,
                         existingFoodItem.Quantity);
                 }
                 else
@@ -130,6 +142,7 @@ public class ReceiptService : IReceiptService
                     var newFoodItem = new FoodItem
                     {
                         Id = Guid.NewGuid(),
+                        UserId = userId,
                         Name = item.Name,
                         Quantity = item.Quantity,
                         Unit = item.Unit ?? string.Empty
@@ -137,8 +150,9 @@ public class ReceiptService : IReceiptService
                     
                     await _foodItemRepository.AddAsync(newFoodItem, cancellationToken);
                     _logger.LogInformation(
-                        "Added new food item '{Name}' to inventory with quantity: {Quantity}",
+                        "Added new food item '{Name}' to inventory for user {UserId} with quantity: {Quantity}",
                         newFoodItem.Name,
+                        userId,
                         newFoodItem.Quantity);
                 }
             }
