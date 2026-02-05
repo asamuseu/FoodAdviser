@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { InventoryApi } from '../api/inventory';
-import type { CreateFoodItemDto, FoodItemDto } from '../api/dtos';
+import type { CreateFoodItemModel, FoodItemModel } from '../api/models';
+import { useAuth } from '../contexts';
 
 type LoadState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'success'; data: FoodItemDto[] };
+  | { status: 'success'; data: FoodItemModel[] };
 
-const emptyForm: CreateFoodItemDto = {
+const emptyForm: CreateFoodItemModel = {
   name: '',
   quantity: 1,
   unit: '',
@@ -15,12 +16,13 @@ const emptyForm: CreateFoodItemDto = {
 };
 
 export default function InventoryPage() {
-  const api = useMemo(() => new InventoryApi(), []);
+  const { apiClient } = useAuth();
+  const api = useMemo(() => new InventoryApi(apiClient), [apiClient]);
   const [state, setState] = useState<LoadState>({ status: 'loading' });
   const [saving, setSaving] = useState(false);
 
   // Form state
-  const [form, setForm] = useState<CreateFoodItemDto>(emptyForm);
+  const [form, setForm] = useState<CreateFoodItemModel>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -56,7 +58,7 @@ export default function InventoryPage() {
     setShowForm(true);
   }
 
-  function openEditForm(item: FoodItemDto) {
+  function openEditForm(item: FoodItemModel) {
     setForm({
       name: item.name,
       quantity: item.quantity,
@@ -81,7 +83,7 @@ export default function InventoryPage() {
     try {
       if (editingId) {
         // Update existing item
-        const updatedItem: FoodItemDto = {
+        const updatedItem: FoodItemModel = {
           id: editingId,
           name: form.name,
           quantity: form.quantity,
@@ -103,7 +105,7 @@ export default function InventoryPage() {
     }
   }
 
-  async function onDelete(item: FoodItemDto) {
+  async function onDelete(item: FoodItemModel) {
     if (!confirm(`Delete "${item.name}"?`)) return;
 
     setSaving(true);

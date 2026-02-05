@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import type { RegisterRequestDto } from '../api/dtos/auth';
+import type { RegisterRequestModel } from '../api/models/auth';
 
 type FormState =
   | { status: 'idle' }
@@ -20,10 +20,11 @@ export default function RegisterPage() {
   const [formState, setFormState] = useState<FormState>({ status: 'idle' });
 
   // Redirect if already logged in
-  if (isAuthenticated) {
-    navigate('/', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -47,7 +48,7 @@ export default function RegisterPage() {
     setFormState({ status: 'submitting' });
 
     try {
-      const request: RegisterRequestDto = {
+      const request: RegisterRequestModel = {
         email,
         password,
         confirmPassword,

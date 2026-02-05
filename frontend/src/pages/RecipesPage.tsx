@@ -1,19 +1,20 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { RecipesApi } from '../api/recipes';
-import { DishType } from '../api/dtos';
-import type { GenerateRecipesRequestDto, RecipeDto, IngredientDto, ConfirmRecipesResponseDto, Guid } from '../api/dtos';
+import { DishType } from '../api/models';
+import type { GenerateRecipesRequestModel, RecipeModel, IngredientModel, ConfirmRecipesResponseModel, Guid } from '../api/models';
+import { useAuth } from '../contexts';
 
 type GenerateState =
   | { status: 'idle' }
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'success'; recipes: RecipeDto[] };
+  | { status: 'success'; recipes: RecipeModel[] };
 
 type ConfirmState =
   | { status: 'idle' }
   | { status: 'confirming' }
   | { status: 'error'; message: string }
-  | { status: 'success'; response: ConfirmRecipesResponseDto };
+  | { status: 'success'; response: ConfirmRecipesResponseModel };
 
 const dishTypeLabels: Record<DishType, string> = {
   [DishType.Undefined]: 'Select dish type…',
@@ -25,9 +26,10 @@ const dishTypeLabels: Record<DishType, string> = {
 };
 
 export default function RecipesPage() {
-  const api = useMemo(() => new RecipesApi(), []);
+  const { apiClient } = useAuth();
+  const api = useMemo(() => new RecipesApi(apiClient), [apiClient]);
 
-  const [form, setForm] = useState<GenerateRecipesRequestDto>({
+  const [form, setForm] = useState<GenerateRecipesRequestModel>({
     dishType: DishType.Undefined,
     numberOfPersons: 2,
   });
@@ -281,7 +283,7 @@ export default function RecipesPage() {
 }
 
 interface RecipeCardProps {
-  recipe: RecipeDto;
+  recipe: RecipeModel;
   isSelected: boolean;
   onSelect: () => void;
   disabled: boolean;
@@ -328,7 +330,7 @@ function RecipeCard({ recipe, isSelected, onSelect, disabled }: RecipeCardProps)
       <div className="recipe-ingredients">
         <h4>Ingredients</h4>
         <ul>
-          {recipe.ingredients.map((ingredient: IngredientDto, index: number) => (
+          {recipe.ingredients.map((ingredient: IngredientModel, index: number) => (
             <li key={index}>
               {ingredient.name}: {ingredient.quantity} {ingredient.unit}
             </li>

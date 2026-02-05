@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import App from './App';
+import { HomePage } from './pages';
 import { ProtectedRoute } from './components';
-import { useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { InventoryPage, LoginPage, ReceiptsPage, RecipesPage, RegisterPage } from './pages';
+import { IconBox, IconReceipt, IconSpark } from './components/home/icons';
 
 function NavBar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -13,9 +14,18 @@ function NavBar() {
         <NavLink to="/" end>
           Home
         </NavLink>
-        <NavLink to="/inventory">Inventory</NavLink>
-        <NavLink to="/receipts">Receipts</NavLink>
-        <NavLink to="/recipes">Recipes</NavLink>
+        <NavLink to="/inventory">
+          <IconBox />
+          Inventory
+        </NavLink>
+        <NavLink to="/receipts">
+          <IconReceipt />
+          Receipts
+        </NavLink>
+        <NavLink to="/recipes">
+          <IconSpark />
+          Recipes
+        </NavLink>
       </div>
       <div className="navbar-auth">
         {isAuthenticated ? (
@@ -39,36 +49,38 @@ function NavBar() {
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route
-          path="/inventory"
-          element={
-            <ProtectedRoute>
-              <InventoryPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/receipts"
-          element={
-            <ProtectedRoute>
-              <ReceiptsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/recipes"
-          element={
-            <ProtectedRoute>
-              <RecipesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
+      <AuthProvider>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute>
+                <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/receipts"
+            element={
+              <ProtectedRoute>
+                <ReceiptsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recipes"
+            element={
+              <ProtectedRoute>
+                <RecipesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

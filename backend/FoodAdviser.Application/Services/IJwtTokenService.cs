@@ -1,4 +1,5 @@
 using FoodAdviser.Domain.Entities;
+using System.Security.Claims;
 
 namespace FoodAdviser.Application.Services;
 
@@ -22,8 +23,21 @@ public interface IJwtTokenService
     string GenerateRefreshToken();
 
     /// <summary>
-    /// Gets the token expiration time.
+    /// Gets the access token expiration time.
     /// </summary>
     /// <returns>The UTC datetime when the token expires.</returns>
     DateTime GetAccessTokenExpiration();
+
+    /// <summary>
+    /// Gets the refresh token expiration time.
+    /// </summary>
+    /// <returns>The UTC datetime when the refresh token expires.</returns>
+    DateTime GetRefreshTokenExpiration();
+
+    /// <summary>
+    /// Validates an access token and returns its claims principal.
+    /// </summary>
+    /// <param name="token">The access token to validate.</param>
+    /// <returns>The claims principal if valid, null otherwise.</returns>
+    ClaimsPrincipal? ValidateAccessToken(string token);
 }

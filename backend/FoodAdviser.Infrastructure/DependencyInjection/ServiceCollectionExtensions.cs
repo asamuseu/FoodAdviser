@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFoodItemRepository, FoodItemRepository>();
         services.AddScoped<IReceiptRepository, ReceiptRepository>();
         services.AddScoped<IRecipeRepository, RecipeRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         // Register auth services
         services.AddScoped<IJwtTokenService, JwtTokenService>();

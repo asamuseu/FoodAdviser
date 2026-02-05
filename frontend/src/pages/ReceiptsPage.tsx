@@ -1,15 +1,17 @@
 import { useMemo, useState, useRef, type ChangeEvent, type DragEvent } from 'react';
 import { ReceiptsApi } from '../api/receipts';
-import type { ReceiptDto, ReceiptLineItemDto } from '../api/dtos';
+import type { ReceiptModel, ReceiptLineItemModel } from '../api/models';
+import { useAuth } from '../contexts';
 
 type UploadState =
   | { status: 'idle' }
   | { status: 'uploading' }
   | { status: 'error'; message: string }
-  | { status: 'success'; receipt: ReceiptDto };
+  | { status: 'success'; receipt: ReceiptModel };
 
 export default function ReceiptsPage() {
-  const api = useMemo(() => new ReceiptsApi(), []);
+  const { apiClient } = useAuth();
+  const api = useMemo(() => new ReceiptsApi(apiClient), [apiClient]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -169,7 +171,7 @@ export default function ReceiptsPage() {
                   <span role="columnheader">Unit</span>
                   <span role="columnheader" className="right">Price</span>
                 </div>
-                {state.receipt.items.map((item: ReceiptLineItemDto, index: number) => (
+                {state.receipt.items.map((item: ReceiptLineItemModel, index: number) => (
                   <div className="trow trow--4col" role="row" key={index}>
                     <span role="cell">{item.name}</span>
                     <span role="cell" className="right">{item.quantity}</span>

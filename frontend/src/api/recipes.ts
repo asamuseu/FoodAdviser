@@ -1,29 +1,33 @@
 import { ApiClient } from './http';
 import type {
-  ConfirmRecipesRequestDto,
-  ConfirmRecipesResponseDto,
-  GenerateRecipesRequestDto,
-  RecipeDto,
-} from './dtos';
-import { DishType } from './dtos';
+  ConfirmRecipesRequestModel,
+  ConfirmRecipesResponseModel,
+  GenerateRecipesRequestModel,
+  RecipeModel,
+} from './models';
+import { DishType } from './models';
 
 export { DishType };
 export type {
-  ConfirmRecipesRequestDto,
-  ConfirmRecipesResponseDto,
-  GenerateRecipesRequestDto,
-  RecipeDto,
+  ConfirmRecipesRequestModel,
+  ConfirmRecipesResponseModel,
+  GenerateRecipesRequestModel,
+  RecipeModel,
 };
 
 export class RecipesApi {
-  private readonly client = new ApiClient();
+  private readonly client: ApiClient;
 
-  generate(dto: GenerateRecipesRequestDto, signal?: AbortSignal): Promise<RecipeDto[]> {
-    return this.client.postJson<RecipeDto[]>('/api/Recipes/generate', dto, signal);
+  constructor(client?: ApiClient) {
+    this.client = client ?? new ApiClient();
   }
 
-  confirm(dto: ConfirmRecipesRequestDto, signal?: AbortSignal): Promise<ConfirmRecipesResponseDto> {
-    return this.client.postJson<ConfirmRecipesResponseDto>('/api/Recipes/confirm', dto, signal);
+  generate(dto: GenerateRecipesRequestModel, signal?: AbortSignal): Promise<RecipeModel[]> {
+    return this.client.postJson<RecipeModel[]>('/api/Recipes/generate', dto, signal);
+  }
+
+  confirm(dto: ConfirmRecipesRequestModel, signal?: AbortSignal): Promise<ConfirmRecipesResponseModel> {
+    return this.client.postJson<ConfirmRecipesResponseModel>('/api/Recipes/confirm', dto, signal);
   }
 
   // OpenAPI marks this endpoint as a stub with unspecified response.

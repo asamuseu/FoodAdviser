@@ -1,6 +1,6 @@
 import type { Guid, IsoDateTime } from './common';
 
-export interface FoodItemDto {
+export interface FoodItemModel {
   id: Guid;
   name: string;
   quantity: number;
@@ -8,7 +8,7 @@ export interface FoodItemDto {
   expiresAt?: IsoDateTime | null;
 }
 
-export interface CreateFoodItemDto {
+export interface CreateFoodItemModel {
   name: string;
   quantity: number;
   unit: string;

@@ -19,6 +19,7 @@ public class FoodAdviserDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<FoodItem> FoodItems => Set<FoodItem>();
     public DbSet<Receipt> Receipts => Set<Receipt>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,7 @@ public class FoodAdviserDbContext : IdentityDbContext<ApplicationUser, Applicati
         modelBuilder.ApplyConfiguration(new FoodItemConfiguration());
         modelBuilder.ApplyConfiguration(new ReceiptConfiguration());
         modelBuilder.ApplyConfiguration(new RecipeConfiguration());
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
 
         // Configure Identity table names (optional - customize as needed)
         modelBuilder.Entity<ApplicationUser>(entity =>

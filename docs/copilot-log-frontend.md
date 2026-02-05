@@ -95,3 +95,24 @@ Add subtle UI animations:
 - Smooth transitions for hover and focus
 - Loading indicators for async actions
 - Avoid heavy or distracting animations
+
+Refactor the existing styles.css file by splitting it into multiple smaller, well-structured CSS files.
+
+Goals:
+- Improve maintainability and readability
+- Follow production SaaS frontend best practices
+- Keep existing styles working without visual regressions
+Requirements:
+- Do not change class names used in React components
+- Do not change visual appearance unless necessary for consistency
+- Extract styles into logical groups
+Suggested structure:
+- base.css (reset, typography, global variables)
+- layout.css (page layout, grids, containers)
+- components.css (buttons, cards, forms, inputs)
+- pages.css (page-specific styles)
+- utilities.css (helpers, spacing, text utilities)
+Instructions:
+- Move existing rules from styles.css into the appropriate new files
+- Keep comments explaining each section
+- Ensure all new files are properly imported so the UI continues to work

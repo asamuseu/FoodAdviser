@@ -1,10 +1,10 @@
 import { ApiClient } from './http';
 import type {
-  AuthResponseDto,
-  LoginRequestDto,
-  RefreshTokenRequestDto,
-  RegisterRequestDto,
-} from './dtos/auth';
+  AuthResponseModel,
+  LoginRequestModel,
+  RefreshTokenRequestModel,
+  RegisterRequestModel,
+} from './models/auth';
 
 /**
  * API client for authentication endpoints.
@@ -19,24 +19,30 @@ export class AuthApi {
   /**
    * Authenticates a user and returns JWT tokens.
    */
-  async login(request: LoginRequestDto, signal?: AbortSignal): Promise<AuthResponseDto> {
-    return this.client.postJson<AuthResponseDto>('/api/auth/login', request, signal);
+  async login(request: LoginRequestModel, signal?: AbortSignal): Promise<AuthResponseModel> {
+    return this.client.postJson<AuthResponseModel>('/api/auth/login', request, signal);
   }
 
   /**
    * Registers a new user.
    */
-  async register(request: RegisterRequestDto, signal?: AbortSignal): Promise<AuthResponseDto> {
-    return this.client.postJson<AuthResponseDto>('/api/auth/register', request, signal);
+  async register(request: RegisterRequestModel, signal?: AbortSignal): Promise<AuthResponseModel> {
+    return this.client.postJson<AuthResponseModel>('/api/auth/register', request, signal);
   }
 
   /**
    * Refreshes an access token using a refresh token.
+   * Note: This endpoint skips authentication to prevent infinite refresh loops.
    */
   async refreshToken(
-    request: RefreshTokenRequestDto,
+    request: RefreshTokenRequestModel,
     signal?: AbortSignal,
-  ): Promise<AuthResponseDto> {
-    return this.client.postJson<AuthResponseDto>('/api/auth/refresh', request, signal);
+  ): Promise<AuthResponseModel> {
+    return this.client.postJson<AuthResponseModel>(
+      '/api/auth/refresh',
+      request,
+      signal,
+      { skipAuth: true },
+    );
   }
 }

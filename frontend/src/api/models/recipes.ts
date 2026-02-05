@@ -1,30 +1,30 @@
 import type { Guid } from './common';
 import type { DishType } from './enums';
 
-export interface IngredientDto {
+export interface IngredientModel {
   name: string;
   quantity: number;
   unit: string;
 }
 
-export interface RecipeDto {
+export interface RecipeModel {
   id: Guid;
   title: string;
   description: string;
   dishType: DishType;
-  ingredients: IngredientDto[];
+  ingredients: IngredientModel[];
 }
 
-export interface GenerateRecipesRequestDto {
+export interface GenerateRecipesRequestModel {
   dishType: DishType;
   numberOfPersons: number;
 }
 
-export interface ConfirmRecipesRequestDto {
+export interface ConfirmRecipesRequestModel {
   recipeIds: Guid[];
 }
 
-export interface InventoryUpdateDto {
+export interface InventoryUpdateModel {
   productName: string;
   previousQuantity: number;
   usedQuantity: number;
@@ -32,9 +32,9 @@ export interface InventoryUpdateDto {
   unit: string;
 }
 
-export interface ConfirmRecipesResponseDto {
+export interface ConfirmRecipesResponseModel {
   success: boolean;
   message: string;
   confirmedRecipesCount: number;
-  inventoryUpdates: InventoryUpdateDto[];
+  inventoryUpdates: InventoryUpdateModel[];
 }

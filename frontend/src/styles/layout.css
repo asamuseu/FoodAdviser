@@ -62,6 +62,9 @@
   transition: background var(--transition-base),
               color var(--transition-base),
               transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .navbar a:hover {

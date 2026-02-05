@@ -16,10 +16,24 @@ namespace FoodAdviser.Infrastructure.Services;
 public class JwtTokenService : IJwtTokenService
 {
     private readonly JwtOptions _jwtOptions;
+    private readonly TokenValidationParameters _tokenValidationParameters;
 
     public JwtTokenService(IOptions<JwtOptions> jwtOptions)
     {
         _jwtOptions = jwtOptions.Value;
+        
+        // Set up token validation parameters
+        _tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
+            ValidateIssuer = true,
+            ValidIssuer = _jwtOptions.Issuer,
+            ValidateAudience = true,
+            ValidAudience = _jwtOptions.Audience,
+            ValidateLifetime = false, // We'll validate lifetime manually for refresh scenarios
+            ClockSkew = TimeSpan.Zero
+        };
     }
 
     /// <inheritdoc />
@@ -78,5 +92,34 @@ public class JwtTokenService : IJwtTokenService
     public DateTime GetAccessTokenExpiration()
     {
         return DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationMinutes);
+    }
+
+    /// <inheritdoc />
+    public DateTime GetRefreshTokenExpiration()
+    {
+        return DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
+    }
+
+    /// <inheritdoc />
+    public ClaimsPrincipal? ValidateAccessToken(string token)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, _tokenValidationParameters, out var validatedToken);
+            
+            // Ensure the token is a JWT and uses the correct algorithm
+            if (validatedToken is not JwtSecurityToken jwtToken ||
+                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return null;
+            }
+
+            return principal;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

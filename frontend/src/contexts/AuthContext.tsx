@@ -7,13 +7,15 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthApi } from '../api/auth';
+import { ApiClient } from '../api/http';
 import type {
-  AuthResponseDto,
-  LoginRequestDto,
-  RegisterRequestDto,
+  AuthResponseModel,
+  LoginRequestModel,
+  RegisterRequestModel,
   User,
-} from '../api/dtos/auth';
+} from '../api/models/auth';
 
 const ACCESS_TOKEN_KEY = 'foodadviser_access_token';
 const REFRESH_TOKEN_KEY = 'foodadviser_refresh_token';
@@ -29,10 +31,12 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   /** The current access token, or null if not logged in. */
   accessToken: string | null;
+  /** Shared API client instance configured with auth interceptors. */
+  apiClient: ApiClient;
   /** Logs in with email and password. Returns the user on success. */
   login: (email: string, password: string) => Promise<User>;
   /** Registers a new user. Returns the user on success. */
-  register: (request: RegisterRequestDto) => Promise<User>;
+  register: (request: RegisterRequestModel) => Promise<User>;
   /** Logs out the current user. */
   logout: () => void;
   /** Refreshes the access token using the stored refresh token. */
@@ -46,7 +50,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
  * Uses sessionStorage by default for better security (cleared when browser closes).
  * For "remember me" functionality, localStorage could be used instead.
  */
-function setAuthData(response: AuthResponseDto): void {
+function setAuthData(response: AuthResponseModel): void {
   sessionStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
   sessionStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
   sessionStorage.setItem(TOKEN_EXPIRY_KEY, response.expiresAt);
@@ -108,8 +112,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const authApi = useMemo(() => new AuthApi(), []);
+  // Create shared API client and auth API instances
+  const apiClient = useMemo(() => new ApiClient(), []);
+  const authApi = useMemo(() => new AuthApi(apiClient), [apiClient]);
 
   // Initialize auth state from storage on mount
   useEffect(() => {
@@ -129,7 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(false);
   }, []);
 
-  const handleAuthResponse = useCallback((response: AuthResponseDto): User => {
+  const handleAuthResponse = useCallback((response: AuthResponseModel): User => {
     setAuthData(response);
     const newUser: User = {
       id: response.userId,
@@ -144,7 +151,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = useCallback(
     async (email: string, password: string): Promise<User> => {
-      const request: LoginRequestDto = { email, password };
+      const request: LoginRequestModel = { email, password };
       const response = await authApi.login(request);
       return handleAuthResponse(response);
     },
@@ -152,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   const register = useCallback(
-    async (request: RegisterRequestDto): Promise<User> => {
+    async (request: RegisterRequestModel): Promise<User> => {
       const response = await authApi.register(request);
       return handleAuthResponse(response);
     },
@@ -163,7 +170,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clearAuthData();
     setUser(null);
     setAccessToken(null);
-  }, []);
+    // Redirect to login page
+    navigate('/login', { replace: true });
+  }, [navigate]);
 
   const refreshAccessToken = useCallback(async (): Promise<string | null> => {
     const refreshToken = getStoredRefreshToken();
@@ -183,18 +192,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [authApi, handleAuthResponse, logout]);
 
+  // Configure the API client with token refresh and logout callbacks
+  useEffect(() => {
+    apiClient.setTokenRefreshCallback(refreshAccessToken);
+    apiClient.setLogoutCallback(logout);
+
+    return () => {
+      apiClient.setTokenRefreshCallback(null);
+      apiClient.setLogoutCallback(null);
+    };
+  }, [apiClient, refreshAccessToken, logout]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       isLoading,
       isAuthenticated: !!user && !!accessToken,
       accessToken,
+      apiClient,
       login,
       register,
       logout,
       refreshAccessToken,
     }),
-    [user, isLoading, accessToken, login, register, logout, refreshAccessToken],
+    [user, isLoading, accessToken, apiClient, login, register, logout, refreshAccessToken],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

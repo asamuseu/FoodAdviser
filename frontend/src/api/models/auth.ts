@@ -1,15 +1,15 @@
 /**
- * Request DTO for user login.
+ * Request model for user login.
  */
-export interface LoginRequestDto {
+export interface LoginRequestModel {
   email: string;
   password: string;
 }
 
 /**
- * Request DTO for user registration.
+ * Request model for user registration.
  */
-export interface RegisterRequestDto {
+export interface RegisterRequestModel {
   email: string;
   password: string;
   confirmPassword: string;
@@ -18,16 +18,16 @@ export interface RegisterRequestDto {
 }
 
 /**
- * Request DTO for refreshing tokens.
+ * Request model for refreshing tokens.
  */
-export interface RefreshTokenRequestDto {
+export interface RefreshTokenRequestModel {
   refreshToken: string;
 }
 
 /**
- * Response DTO for successful authentication.
+ * Response model for successful authentication.
  */
-export interface AuthResponseDto {
+export interface AuthResponseModel {
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
