@@ -85,6 +85,9 @@ export default function ReceiptsPage() {
     return value.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
   }
 
+  const isError = state.status === 'error';
+  const errorId = isError ? 'receipt-error' : undefined;
+
   return (
     <div className="container">
       <h1 className="header">Upload Receipt</h1>
@@ -93,11 +96,13 @@ export default function ReceiptsPage() {
       {/* Upload area */}
       {state.status !== 'success' && (
         <div
-          className={`drop-zone ${dragOver ? 'drop-zone--active' : ''} ${state.status === 'uploading' ? 'drop-zone--disabled' : ''}`}
+          className={`drop-zone ${dragOver ? 'drop-zone--active' : ''} ${state.status === 'uploading' ? 'drop-zone--disabled' : ''} ${isError ? 'drop-zone--error' : ''}`}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           onClick={() => state.status !== 'uploading' && fileInputRef.current?.click()}
+          aria-invalid={isError}
+          aria-describedby={errorId}
         >
           <input
             ref={fileInputRef}
@@ -105,6 +110,7 @@ export default function ReceiptsPage() {
             accept="image/png,image/jpeg"
             onChange={onFileChange}
             style={{ display: 'none' }}
+            aria-describedby={errorId}
           />
           {state.status === 'uploading' ? (
             <div className="drop-zone__content">
@@ -142,7 +148,9 @@ export default function ReceiptsPage() {
 
       {/* Error state */}
       {state.status === 'error' && (
-        <p className="error">Error: {state.message}</p>
+        <div id={errorId} className="alert-error" role="alert">
+          {state.message}
+        </div>
       )}
 
       {/* Success state - show extracted products */}

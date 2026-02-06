@@ -428,6 +428,29 @@ select:disabled {
   font-size: var(--font-size-sm);
 }
 
+.alert-error {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: var(--color-error-light);
+  border: 1.5px solid var(--color-error);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  line-height: var(--line-height-normal);
+  animation: slideDown 0.2s ease;
+  margin: var(--spacing-md) 0;
+}
+
+.alert-error::before {
+  content: '⚠';
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
 .form-field.has-success input,
 .form-field.has-success select,
 .form-field.has-success textarea {

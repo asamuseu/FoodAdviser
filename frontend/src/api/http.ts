@@ -35,7 +35,7 @@ function joinUrl(baseUrl: string, path: string): string {
 
 async function readBodySafe(response: Response): Promise<unknown> {
   const contentType = response.headers.get('content-type') ?? '';
-  if (contentType.includes('application/json') || contentType.includes('text/json')) {
+  if (contentType.includes('json')) {
     try {
       return await response.json();
     } catch {
@@ -47,6 +47,70 @@ async function readBodySafe(response: Response): Promise<unknown> {
   } catch {
     return null;
   }
+}
+
+function extractErrorMessage(details: unknown): string | null {
+  if (!details) return null;
+
+  if (typeof details === 'string') {
+    const trimmed = details.trim();
+    if (trimmed.length === 0) return null;
+    return trimmed;
+  }
+
+  if (Array.isArray(details)) {
+    for (const item of details) {
+      if (typeof item === 'string' && item.trim().length > 0) {
+        return item.trim();
+      }
+    }
+    return null;
+  }
+
+  if (typeof details === 'object') {
+    const record = details as Record<string, unknown>;
+    const directKeys = ['detail', 'message', 'error', 'description'];
+    for (const key of directKeys) {
+      const value = record[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+
+    const errors = record.errors;
+    if (Array.isArray(errors)) {
+      for (const item of errors) {
+        if (typeof item === 'string' && item.trim().length > 0) {
+          return item.trim();
+        }
+      }
+    } else if (errors && typeof errors === 'object') {
+      for (const value of Object.values(errors)) {
+        if (typeof value === 'string' && value.trim().length > 0) {
+          return value.trim();
+        }
+        if (Array.isArray(value)) {
+          const firstString = value.find(
+            (entry) => typeof entry === 'string' && entry.trim().length > 0,
+          );
+          if (firstString) {
+            return firstString.trim();
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+function defaultMessageForStatus(status: number): string {
+  if (status === 400) return 'Request failed. Please check your input.';
+  if (status === 401) return 'Authentication failed. Please check your credentials.';
+  if (status === 403) return 'You do not have permission to perform this action.';
+  if (status === 404) return 'We could not find what you were looking for.';
+  if (status >= 500) return 'Something went wrong on our end. Please try again.';
+  return 'Request failed. Please try again.';
 }
 
 export class ApiClient {
@@ -100,12 +164,21 @@ export class ApiClient {
       }
     }
 
-    const response = await fetch(joinUrl(this.baseUrl, path), {
-      method: options?.method ?? 'GET',
-      headers,
-      body: options?.body ?? null,
-      signal: options?.signal,
-    });
+    let response: Response;
+    try {
+      response = await fetch(joinUrl(this.baseUrl, path), {
+        method: options?.method ?? 'GET',
+        headers,
+        body: options?.body ?? null,
+        signal: options?.signal,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? 'Unable to reach the server. Please check your connection and try again.'
+          : 'Unable to reach the server. Please try again.';
+      throw new Error(message);
+    }
 
     // Handle 401 Unauthorized - attempt token refresh and retry
     if (response.status === 401 && !options?.skipAuth && !options?.skipRetry) {
@@ -123,10 +196,8 @@ export class ApiClient {
 
     if (!response.ok) {
       const details = await readBodySafe(response);
-      const message =
-        typeof details === 'string' && details.trim().length > 0
-          ? details
-          : response.statusText || `Request failed (${response.status})`;
+      const extractedMessage = extractErrorMessage(details);
+      const message = extractedMessage ?? defaultMessageForStatus(response.status);
       const error: ApiError = { status: response.status, message, details };
       throw Object.assign(new Error(message), { apiError: error });
     }

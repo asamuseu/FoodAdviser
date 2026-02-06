@@ -20,14 +20,18 @@ export default function InventoryPage() {
   const api = useMemo(() => new InventoryApi(apiClient), [apiClient]);
   const [state, setState] = useState<LoadState>({ status: 'loading' });
   const [saving, setSaving] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Form state
   const [form, setForm] = useState<CreateFoodItemModel>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<FoodItemModel | null>(null);
 
   async function loadInventory() {
     setState({ status: 'loading' });
+    setActionError(null);
     try {
       const items = await api.list({ page: 1, pageSize: 100 });
       setState({ status: 'success', data: items });
@@ -42,7 +46,10 @@ export default function InventoryPage() {
 
     api
       .list({ page: 1, pageSize: 100, signal: controller.signal })
-      .then((items) => setState({ status: 'success', data: items }))
+      .then((items) => {
+        setState({ status: 'success', data: items });
+        setActionError(null);
+      })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return;
         const message = error instanceof Error ? error.message : 'Failed to load inventory.';
@@ -55,6 +62,7 @@ export default function InventoryPage() {
   function openAddForm() {
     setForm(emptyForm);
     setEditingId(null);
+    setFormError(null);
     setShowForm(true);
   }
 
@@ -66,13 +74,23 @@ export default function InventoryPage() {
       expiresAt: item.expiresAt ?? null,
     });
     setEditingId(item.id);
+    setFormError(null);
     setShowForm(true);
   }
 
   function closeForm() {
     setForm(emptyForm);
     setEditingId(null);
+    setFormError(null);
     setShowForm(false);
+  }
+
+  function openDeleteModal(item: FoodItemModel) {
+    setDeleteTarget(item);
+  }
+
+  function closeDeleteModal() {
+    setDeleteTarget(null);
   }
 
   async function onSubmit(e: FormEvent) {
@@ -80,6 +98,7 @@ export default function InventoryPage() {
     if (!form.name.trim() || !form.unit.trim()) return;
 
     setSaving(true);
+    setFormError(null);
     try {
       if (editingId) {
         // Update existing item
@@ -99,22 +118,21 @@ export default function InventoryPage() {
       await loadInventory();
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to save item.';
-      alert(message);
+      setFormError(message);
     } finally {
       setSaving(false);
     }
   }
 
   async function onDelete(item: FoodItemModel) {
-    if (!confirm(`Delete "${item.name}"?`)) return;
-
     setSaving(true);
     try {
       await api.remove(item.id);
       await loadInventory();
+      closeDeleteModal();
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to delete item.';
-      alert(message);
+      setActionError(message);
     } finally {
       setSaving(false);
     }
@@ -142,7 +160,7 @@ export default function InventoryPage() {
     return (
       <div className="container">
         <h1 className="header">Inventory</h1>
-        <p className="error">Error: {state.message}</p>
+        <div className="alert-error" role="alert">{state.message}</div>
         <button onClick={loadInventory}>Retry</button>
       </div>
     );
@@ -159,6 +177,10 @@ export default function InventoryPage() {
         </button>
       </div>
 
+      {actionError && (
+        <div className="alert-error" role="alert">{actionError}</div>
+      )}
+
       <p className="muted">{items.length} product(s) in stock</p>
 
       {/* Add/Edit Form Modal */}
@@ -166,7 +188,16 @@ export default function InventoryPage() {
         <div className="modal-overlay" onClick={closeForm}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2>{editingId ? 'Edit Product' : 'Add Product'}</h2>
-            <form onSubmit={onSubmit} className="form">
+            <form
+              onSubmit={onSubmit}
+              className={`form${formError ? ' form--invalid' : ''}`}
+              aria-invalid={!!formError}
+            >
+              {formError && (
+                <div className="alert-error" role="alert">
+                  {formError}
+                </div>
+              )}
               <label className="form-field">
                 <span>Name</span>
                 <input
@@ -176,6 +207,7 @@ export default function InventoryPage() {
                   placeholder="Product name"
                   required
                   autoFocus
+                  aria-invalid={!!formError}
                 />
               </label>
 
@@ -189,6 +221,7 @@ export default function InventoryPage() {
                     min="0.01"
                     step="0.01"
                     required
+                    aria-invalid={!!formError}
                   />
                 </label>
 
@@ -200,6 +233,7 @@ export default function InventoryPage() {
                     onChange={(e) => setForm({ ...form, unit: e.target.value })}
                     placeholder="kg, pcs, L…"
                     required
+                    aria-invalid={!!formError}
                   />
                 </label>
               </div>
@@ -212,6 +246,7 @@ export default function InventoryPage() {
                   onChange={(e) =>
                     setForm({ ...form, expiresAt: e.target.value ? new Date(e.target.value).toISOString() : null })
                   }
+                  aria-invalid={!!formError}
                 />
               </label>
 
@@ -224,6 +259,30 @@ export default function InventoryPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={closeDeleteModal}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Delete Product</h2>
+            <p>
+              Are you sure you want to delete <strong>{deleteTarget.name}</strong>?
+            </p>
+            <div className="form-actions">
+              <button type="button" onClick={closeDeleteModal} className="secondary" disabled={saving}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => onDelete(deleteTarget)}
+                disabled={saving}
+              >
+                {saving ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -258,7 +317,7 @@ export default function InventoryPage() {
                   ✏️
                 </button>
                 <button
-                  onClick={() => onDelete(item)}
+                  onClick={() => openDeleteModal(item)}
                   className="btn-icon danger"
                   title="Delete"
                   disabled={saving}

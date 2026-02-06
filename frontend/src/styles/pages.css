@@ -881,6 +881,12 @@
   pointer-events: none;
 }
 
+.drop-zone--error {
+  border-color: var(--color-error);
+  background: rgba(239, 68, 68, 0.06);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.12);
+}
+
 .drop-zone__content {
   display: flex;
   flex-direction: column;
@@ -952,6 +958,24 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+}
+
+.auth-form--invalid input,
+.auth-form--invalid textarea,
+.form--invalid input,
+.form--invalid textarea,
+.form--invalid select {
+  border-color: var(--color-error);
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.auth-form--invalid input:focus,
+.auth-form--invalid textarea:focus,
+.form--invalid input:focus,
+.form--invalid textarea:focus,
+.form--invalid select:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  border-color: var(--color-error);
 }
 
 .auth-error {

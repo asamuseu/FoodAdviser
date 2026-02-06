@@ -91,6 +91,9 @@ export default function RecipesPage() {
     setConfirmState({ status: 'idle' });
   }
 
+  const isFormError = state.status === 'error';
+  const formErrorId = isFormError ? 'recipe-form-error' : undefined;
+
   return (
     <div className="container">
       <div className="page-header">
@@ -103,7 +106,11 @@ export default function RecipesPage() {
       {/* Generation Form - Input Section */}
       <section className="recipe-generator-section">
         <h2 className="section-title">Recipe Preferences</h2>
-        <form onSubmit={onSubmit} className="recipe-form">
+        <form
+          onSubmit={onSubmit}
+          className={`recipe-form${isFormError ? ' form--invalid' : ''}`}
+          aria-invalid={isFormError}
+        >
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="dishType">
@@ -114,6 +121,8 @@ export default function RecipesPage() {
                 value={form.dishType}
                 onChange={(e) => setForm({ ...form, dishType: Number(e.target.value) as DishType })}
                 disabled={state.status === 'loading'}
+                aria-invalid={isFormError}
+                aria-describedby={formErrorId}
               >
                 {Object.entries(dishTypeLabels).map(([value, label]) => (
                   <option key={value} value={value} disabled={Number(value) === DishType.Undefined}>
@@ -136,6 +145,8 @@ export default function RecipesPage() {
                 max="100"
                 placeholder="2"
                 disabled={state.status === 'loading'}
+                aria-invalid={isFormError}
+                aria-describedby={formErrorId}
               />
               <span className="help-text">Between 1 and 100 persons</span>
             </div>
@@ -159,7 +170,7 @@ export default function RecipesPage() {
 
         {/* Error state in input section */}
         {state.status === 'error' && (
-          <div className="recipe-error">
+          <div id={formErrorId} className="alert-error" role="alert">
             {state.message}
           </div>
         )}
@@ -227,7 +238,7 @@ export default function RecipesPage() {
 
           {/* Confirmation error */}
           {confirmState.status === 'error' && (
-            <div className="recipe-error">
+            <div className="alert-error" role="alert">
               {confirmState.message}
             </div>
           )}

@@ -48,6 +48,8 @@ export default function LoginPage() {
   };
 
   const isSubmitting = formState.status === 'submitting';
+  const isError = formState.status === 'error';
+  const errorId = isError ? 'auth-error' : undefined;
 
   return (
     <div className="container">
@@ -55,9 +57,15 @@ export default function LoginPage() {
         <h1>Sign In</h1>
         <p className="muted">Welcome back! Sign in to access your inventory and recipes.</p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {formState.status === 'error' && (
-            <div className="auth-error">{formState.message}</div>
+        <form
+          className={`auth-form${isError ? ' auth-form--invalid' : ''}`}
+          onSubmit={handleSubmit}
+          aria-invalid={isError}
+        >
+          {isError && (
+            <div id={errorId} className="alert-error" role="alert">
+              {formState.message}
+            </div>
           )}
 
           <div className="form-group">
@@ -71,6 +79,8 @@ export default function LoginPage() {
               required
               disabled={isSubmitting}
               autoComplete="email"
+              aria-invalid={isError}
+              aria-describedby={errorId}
             />
           </div>
 
@@ -85,6 +95,8 @@ export default function LoginPage() {
               required
               disabled={isSubmitting}
               autoComplete="current-password"
+              aria-invalid={isError}
+              aria-describedby={errorId}
             />
           </div>
 

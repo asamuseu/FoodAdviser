@@ -97,7 +97,6 @@ Add subtle UI animations:
 - Avoid heavy or distracting animations
 
 Refactor the existing styles.css file by splitting it into multiple smaller, well-structured CSS files.
-
 Goals:
 - Improve maintainability and readability
 - Follow production SaaS frontend best practices
@@ -116,3 +115,90 @@ Instructions:
 - Move existing rules from styles.css into the appropriate new files
 - Keep comments explaining each section
 - Ensure all new files are properly imported so the UI continues to work
+
+----
+Implement automatic access token refresh in the FoodAdviser frontend application.
+Requirements:
+- The application uses JWT access tokens and refresh tokens
+- Access token is sent with API requests in the Authorization header
+- When the API responds with 401 Unauthorized due to an expired access token, the app should automatically refresh the token and retry the original request
+Implementation details:
+- Store access token and refresh token securely on the client
+- Add a centralized HTTP layer (e.g. API client or interceptor)
+- Intercept failed requests with 401 status
+- Call the token refresh endpoint using the refresh token
+- Update stored tokens after successful refresh
+- Retry the original failed request transparently
+- If token refresh fails, log the user out and redirect to the login page
+Constraints:
+- Do not require manual user action for token refresh
+- Avoid multiple simultaneous refresh calls (handle concurrent requests properly)
+- Keep existing API contracts unchanged
+Implement this in a clean, production-ready way.
+
+Create an apropriate favicon for the app
+
+Refactor the existing Home page of the FoodAdviser frontend application to look like a production SaaS landing page.
+Goals:
+- Make the Home page visually appealing, modern, and welcoming
+- Clearly communicate the purpose of the app (food inventory + recipe assistant)
+- Guide the user to the main actions of the application
+UX requirements:
+- Add a clear hero section with a title, short description, and primary call-to-action
+- Highlight key features (e.g. manage products, scan receipts, generate recipes)
+- Use clear visual hierarchy and spacing
+- Keep the page clean, minimal, and easy to scan
+- Ensure responsive behavior for mobile and desktop
+Visual style:
+- Production SaaS look and feel
+- Calm, food-related color palette aligned with FoodAdviser theme
+- Rounded cards, subtle shadows, and consistent typography
+- Avoid clutter and unnecessary animations
+Images:
+- Add illustrative images or visuals to improve the page
+- If real images are not available, use:
+  - Placeholder images
+  - Stock-style images
+  - Or programmatically generated images (e.g. via image URLs)
+- Images should be relevant to food, cooking, or productivity
+- Ensure images are optional and do not block page functionality
+Constraints:
+- Do not change existing routing or business logic
+- Keep navigation intact
+- Focus only on improving the Home page UI and UX
+ Refactor the Home page accordingly.
+ If image generation is not supported directly, prepare the UI in a way that allows easy replacement of placeholder images with AI-generated or stock images later.
+
+ Create a dedicated file for the home page and put it with ather pages
+
+ Do refactoring of the Home page.
+- Move Icons to dedicated components folder
+- Separate into logical, reusable components
+- Use map() for cleaner code for features, metrics, and steps
+
+Rename the folder dtos to models. Rename interfaces in that folder, use a suffix Model instead of Dto.
+
+
+Refactor authentication error handling of the FoodAdviser frontend.
+Problem:
+API errors are currently displayed as raw JSON, which is not user-friendly.
+Goals:
+- Properly parse API error responses
+- Display clean, human-readable error messages
+- Hide technical details such as status codes and JSON structure
+Requirements:
+- Extract the error message from the API response (e.g. detail or message field)
+- Display a friendly message like:  "Invalid email or password."
+- Do not display raw JSON or technical fields (title, status, traceId, etc.)
+UI behavior:
+- Show the error in a styled alert or inline form message
+- Keep user-entered email intact
+- Highlight the form as invalid if authentication fails
+- Allow the user to retry immediately
+Technical details:
+- Update the API error parsing logic in the login request
+- Normalize error responses if needed
+- Ensure try/catch handles fetch error structures correctly
+Do not modify backend responses — adapt the frontend only.
+
+Added a delete confirmation modal and wired delete buttons to open it instead of using confirm()

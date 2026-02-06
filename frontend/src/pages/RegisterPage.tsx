@@ -67,6 +67,8 @@ export default function RegisterPage() {
   };
 
   const isSubmitting = formState.status === 'submitting';
+  const isError = formState.status === 'error';
+  const errorId = isError ? 'register-error' : undefined;
 
   return (
     <div className="container">
@@ -74,9 +76,15 @@ export default function RegisterPage() {
         <h1>Create Account</h1>
         <p className="muted">Join FoodAdviser to manage your inventory and discover recipes.</p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {formState.status === 'error' && (
-            <div className="auth-error">{formState.message}</div>
+        <form
+          className={`auth-form${isError ? ' auth-form--invalid' : ''}`}
+          onSubmit={handleSubmit}
+          aria-invalid={isError}
+        >
+          {isError && (
+            <div id={errorId} className="alert-error" role="alert">
+              {formState.message}
+            </div>
           )}
 
           <div className="form-group">
@@ -90,6 +98,8 @@ export default function RegisterPage() {
               required
               disabled={isSubmitting}
               autoComplete="email"
+              aria-invalid={isError}
+              aria-describedby={errorId}
             />
           </div>
 
@@ -104,6 +114,8 @@ export default function RegisterPage() {
                 placeholder="John"
                 disabled={isSubmitting}
                 autoComplete="given-name"
+                aria-invalid={isError}
+                aria-describedby={errorId}
               />
             </div>
 
@@ -117,6 +129,8 @@ export default function RegisterPage() {
                 placeholder="Doe"
                 disabled={isSubmitting}
                 autoComplete="family-name"
+                aria-invalid={isError}
+                aria-describedby={errorId}
               />
             </div>
           </div>
@@ -133,6 +147,8 @@ export default function RegisterPage() {
               minLength={8}
               disabled={isSubmitting}
               autoComplete="new-password"
+              aria-invalid={isError}
+              aria-describedby={errorId}
             />
           </div>
 
@@ -148,6 +164,8 @@ export default function RegisterPage() {
               minLength={8}
               disabled={isSubmitting}
               autoComplete="new-password"
+              aria-invalid={isError}
+              aria-describedby={errorId}
             />
           </div>
 
