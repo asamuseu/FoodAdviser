@@ -1,7 +1,6 @@
 using AutoMapper;
 using FoodAdviser.Application.DTOs.Recipes;
 using FoodAdviser.Application.Services.Interfaces;
-using FoodAdviser.Domain.Entities;
 using FoodAdviser.Application.Options;
 using FoodAdviser.Domain.Enums;
 using FoodAdviser.Domain.Repositories;

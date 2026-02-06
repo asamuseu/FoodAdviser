@@ -1,7 +1,11 @@
 <Solution>
-  <Project Path="FoodAdviser.Api.Tests/FoodAdviser.Api.Tests.csproj" />
-  <Project Path="FoodAdviser.Api/FoodAdviser.Api.csproj" />
-  <Project Path="FoodAdviser.Application/FoodAdviser.Application.csproj" />
-  <Project Path="FoodAdviser.Domain/FoodAdviser.Domain.csproj" />
-  <Project Path="FoodAdviser.Infrastructure/FoodAdviser.Infrastructure.csproj" />
+  <Folder Name="/Src/" >
+    <Project Path="Src/FoodAdviser.Api/FoodAdviser.Api.csproj" />
+    <Project Path="Src/FoodAdviser.Application/FoodAdviser.Application.csproj" />
+    <Project Path="Src/FoodAdviser.Domain/FoodAdviser.Domain.csproj" />
+    <Project Path="Src/FoodAdviser.Infrastructure/FoodAdviser.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Tests/" >
+    <Project Path="Tests/FoodAdviser.Api.Tests/FoodAdviser.Api.Tests.csproj" />
+  </Folder>
 </Solution>

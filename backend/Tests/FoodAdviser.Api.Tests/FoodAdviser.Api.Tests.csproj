@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodAdviser.Api\FoodAdviser.Api.csproj" />
+    <ProjectReference Include="..\..\Src\FoodAdviser.Api\FoodAdviser.Api.csproj" />
   </ItemGroup>
 
 </Project>

@@ -22,4 +22,8 @@
     <ProjectReference Include="..\FoodAdviser.Infrastructure\FoodAdviser.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Recipes\" />
+  </ItemGroup>
+
 </Project>
