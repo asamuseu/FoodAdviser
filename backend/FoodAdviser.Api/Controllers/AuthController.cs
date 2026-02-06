@@ -1,6 +1,6 @@
 using FoodAdviser.Api.DTOs.Auth;
 using FoodAdviser.Application.DTOs.Auth;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

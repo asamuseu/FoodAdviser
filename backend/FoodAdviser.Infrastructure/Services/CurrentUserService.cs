@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace FoodAdviser.Infrastructure.Services;

@@ -2,7 +2,7 @@ using FluentValidation;
 using FoodAdviser.Application.DTOs.Recipes;
 using FoodAdviser.Domain.Enums;
 
-namespace FoodAdviser.Api.DTOs.Recipes.Validators;
+namespace FoodAdviser.Api.Validators.Recipes;
 
 /// <summary>
 /// Validator for <see cref="GenerateRecipesRequestDto"/>.

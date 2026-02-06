@@ -1,6 +1,7 @@
 using AutoMapper;
 using FoodAdviser.Application.DTOs.Receipts;
 using FoodAdviser.Application.Options;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Entities;
 using FoodAdviser.Domain.Repositories;
 using Microsoft.AspNetCore.Http;

@@ -1,7 +1,7 @@
 using FoodAdviser.Domain.Entities;
 using FoodAdviser.Domain.Enums;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service interface for AI-powered recipe generation.

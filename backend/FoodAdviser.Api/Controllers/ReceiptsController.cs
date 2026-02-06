@@ -1,5 +1,5 @@
 using FoodAdviser.Application.DTOs.Receipts;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FoodAdviser.Api.DTOs.Receipts;

@@ -1,6 +1,6 @@
 using FoodAdviser.Domain.Entities;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service that analyzes receipt images and extracts structured data.

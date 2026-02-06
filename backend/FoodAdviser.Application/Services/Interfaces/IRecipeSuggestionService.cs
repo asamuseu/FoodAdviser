@@ -1,7 +1,7 @@
 using FoodAdviser.Application.DTOs.Recipes;
 using FoodAdviser.Domain.Enums;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service interface for generating and managing recipe suggestions.

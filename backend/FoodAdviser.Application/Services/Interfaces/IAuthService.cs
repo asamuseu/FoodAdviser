@@ -1,6 +1,6 @@
 using FoodAdviser.Application.DTOs.Auth;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service for handling authentication operations.

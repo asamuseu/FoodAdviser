@@ -1,6 +1,6 @@
 using FoodAdviser.Application.Options;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Factory interface for creating AI recipe services based on configuration.

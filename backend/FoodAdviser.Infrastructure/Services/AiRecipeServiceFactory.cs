@@ -1,5 +1,5 @@
 using FoodAdviser.Application.Options;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

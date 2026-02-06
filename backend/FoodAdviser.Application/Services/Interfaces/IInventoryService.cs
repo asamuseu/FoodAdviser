@@ -1,6 +1,6 @@
 using FoodAdviser.Application.DTOs.Recipes;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service interface for managing user inventory operations.

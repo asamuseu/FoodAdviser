@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using FoodAdviser.Application.Options;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

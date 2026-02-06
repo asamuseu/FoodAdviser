@@ -1,5 +1,5 @@
 using FoodAdviser.Application.DTOs.Auth;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Entities;
 using FoodAdviser.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;

@@ -1,8 +1,9 @@
 using FluentValidation;
+using FoodAdviser.Api.DTOs.Receipts;
 using FoodAdviser.Application.Options;
 using Microsoft.Extensions.Options;
 
-namespace FoodAdviser.Api.DTOs.Receipts.Validators;
+namespace FoodAdviser.Api.Validators.Receipts;
 
 /// <summary>
 /// Validator for <see cref="UploadReceiptDto"/>.

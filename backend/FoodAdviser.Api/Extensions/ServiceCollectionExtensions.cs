@@ -1,8 +1,9 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using FoodAdviser.Api.DTOs.Receipts.Validators;
+using FoodAdviser.Api.Validators.Receipts;
 using FoodAdviser.Application.Mapping;
 using FoodAdviser.Application.Options;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Application.Services;
 using FoodAdviser.Infrastructure.DependencyInjection;
 using FoodAdviser.Infrastructure.Services;

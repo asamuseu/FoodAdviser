@@ -1,7 +1,7 @@
 using FoodAdviser.Domain.Entities;
 using System.Security.Claims;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service for generating and validating JWT tokens.

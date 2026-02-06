@@ -1,7 +1,7 @@
 using FoodAdviser.Application.DTOs.Inventory;
-using FoodAdviser.Application.Services;
-using FoodAdviser.Domain.Entities;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Repositories;
+using FoodAdviser.Api.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,7 +36,7 @@ public class InventoryController : ControllerBase
         
         var userId = _currentUserService.GetRequiredUserId();
         var items = await _repo.GetPagedAsync(page, pageSize, userId, ct);
-        var result = items.Select(MapToDto).ToList();
+        var result = items.Select(item => item.ToDto()).ToList();
         return Ok(result);
     }
 
@@ -47,7 +47,7 @@ public class InventoryController : ControllerBase
         var userId = _currentUserService.GetRequiredUserId();
         var item = await _repo.GetByIdAsync(id, userId, ct);
         if (item is null) return NotFound();
-        return Ok(MapToDto(item));
+        return Ok(item.ToDto());
     }
 
     /// <summary>Creates a new food item.</summary>
@@ -57,10 +57,10 @@ public class InventoryController : ControllerBase
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         
         var userId = _currentUserService.GetRequiredUserId();
-        var entity = MapFromCreate(dto, userId);
+        var entity = dto.ToEntity(userId);
         entity.Id = Guid.NewGuid();
         var created = await _repo.AddAsync(entity, ct);
-        var result = MapToDto(created);
+        var result = created.ToDto();
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -76,7 +76,7 @@ public class InventoryController : ControllerBase
         var existing = await _repo.GetByIdAsync(id, userId, ct);
         if (existing is null) return NotFound();
         
-        var entity = MapFromDto(dto, userId);
+        var entity = dto.ToEntity(userId);
         await _repo.UpdateAsync(entity, ct);
         return NoContent();
     }
@@ -89,32 +89,4 @@ public class InventoryController : ControllerBase
         await _repo.DeleteAsync(id, userId, ct);
         return NoContent();
     }
-
-    private static FoodItemDto MapToDto(FoodItem item) => new()
-    {
-        Id = item.Id,
-        Name = item.Name,
-        Quantity = item.Quantity,
-        Unit = item.Unit,
-        ExpiresAt = item.ExpiresAt
-    };
-
-    private static FoodItem MapFromDto(FoodItemDto dto, Guid userId) => new()
-    {
-        Id = dto.Id,
-        UserId = userId,
-        Name = dto.Name,
-        Quantity = dto.Quantity,
-        Unit = dto.Unit,
-        ExpiresAt = dto.ExpiresAt
-    };
-
-    private static FoodItem MapFromCreate(CreateFoodItemDto dto, Guid userId) => new()
-    {
-        UserId = userId,
-        Name = dto.Name,
-        Quantity = dto.Quantity,
-        Unit = dto.Unit,
-        ExpiresAt = dto.ExpiresAt
-    };
 }

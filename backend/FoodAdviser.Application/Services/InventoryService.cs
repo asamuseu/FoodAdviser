@@ -1,4 +1,5 @@
 using FoodAdviser.Application.DTOs.Recipes;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 

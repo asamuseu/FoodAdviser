@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FoodAdviser.Application.Options;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Entities;
 using FoodAdviser.Domain.Enums;
 using Microsoft.Extensions.Logging;

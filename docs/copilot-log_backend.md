@@ -73,3 +73,9 @@ Constraints:
 - Use existing authentication setup
 - Keep changes backward-compatible
 - Follow production-ready best practices
+
+---Refactoring
+
+Remove Mappings from the controller to dedicated file
+
+Move all interfeces from the Services folder to 'Services/Interfaces'

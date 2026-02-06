@@ -1,4 +1,4 @@
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service for accessing the current authenticated user's information.

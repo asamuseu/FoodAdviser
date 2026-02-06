@@ -1,6 +1,6 @@
 using FoodAdviser.Application.DTOs.Receipts;
 
-namespace FoodAdviser.Application.Services;
+namespace FoodAdviser.Application.Services.Interfaces;
 
 /// <summary>
 /// Service for managing receipt operations including upload, analysis, and retrieval.

@@ -1,10 +1,9 @@
 using FoodAdviser.Application.Options;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Veryfi;
 
 namespace FoodAdviser.Infrastructure.Services;

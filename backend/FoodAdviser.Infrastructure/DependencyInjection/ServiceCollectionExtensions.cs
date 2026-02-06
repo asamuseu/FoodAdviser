@@ -1,6 +1,6 @@
 using System.Text;
 using FoodAdviser.Application.Options;
-using FoodAdviser.Application.Services;
+using FoodAdviser.Application.Services.Interfaces;
 using FoodAdviser.Domain.Entities;
 using FoodAdviser.Domain.Repositories;
 using FoodAdviser.Infrastructure.Persistence;
