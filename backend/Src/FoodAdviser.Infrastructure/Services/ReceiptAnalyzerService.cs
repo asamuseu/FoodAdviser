@@ -49,7 +49,7 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
 
                 var documentResponse = await api.Documents2Async(request, cancellationToken: cancellationToken);
 
-                var json = documentResponse.ToString();
+                var json = documentResponse?.ToString() ?? throw new InvalidOperationException("Failed to get response from Veryfi API");
                 var document = JsonConvert.DeserializeObject<Document>(json, JsonSettings) ?? new Document();
 
                 return MapToDomain(document);
@@ -69,10 +69,7 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
 
     private static Receipt MapToDomain(Document document)
     {
-        if (document == null)
-        {
-            return null;
-        }
+        ArgumentNullException.ThrowIfNull(document);
 
         var items = new List<ReceiptLineItem>();
         if (document.Line_items != null)

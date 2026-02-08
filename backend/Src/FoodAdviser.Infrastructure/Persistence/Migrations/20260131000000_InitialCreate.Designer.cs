@@ -51,7 +51,7 @@ partial class InitialCreate
             b.HasIndex("Name")
                 .IsUnique();
 
-            b.ToTable("food_items", (string)null);
+            b.ToTable("food_items", (string?)null);
         });
 
         modelBuilder.Entity("FoodAdviser.Domain.Entities.Receipt", b =>
@@ -64,7 +64,7 @@ partial class InitialCreate
 
             b.HasKey("Id");
 
-            b.ToTable("receipts", (string)null);
+            b.ToTable("receipts", (string?)null);
         });
 
         modelBuilder.Entity("FoodAdviser.Domain.Entities.Recipe", b =>
@@ -89,7 +89,7 @@ partial class InitialCreate
 
             b.HasKey("Id");
 
-            b.ToTable("recipes", (string)null);
+            b.ToTable("recipes", (string?)null);
         });
 
         modelBuilder.Entity("FoodAdviser.Domain.Entities.Receipt", b =>
@@ -122,7 +122,7 @@ partial class InitialCreate
 
                 b1.HasIndex("ReceiptId");
 
-                b1.ToTable("receipt_line_items", (string)null);
+                b1.ToTable("receipt_line_items", (string?)null);
 
                 b1.WithOwner()
                     .HasForeignKey("ReceiptId");
@@ -152,7 +152,7 @@ partial class InitialCreate
 
                 b1.HasKey("RecipeId", "Name");
 
-                b1.ToTable("recipe_ingredients", (string)null);
+                b1.ToTable("recipe_ingredients", (string?)null);
 
                 b1.WithOwner()
                     .HasForeignKey("RecipeId");
