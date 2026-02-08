@@ -203,13 +203,13 @@ public class AuthService : IAuthService
         if (_httpContextAccessor.HttpContext?.Connection.RemoteIpAddress != null)
         {
             var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
-            
+
             // Handle IPv4 mapped to IPv6
             if (ipAddress.IsIPv4MappedToIPv6)
             {
                 ipAddress = ipAddress.MapToIPv4();
             }
-            
+
             return ipAddress.ToString();
         }
 

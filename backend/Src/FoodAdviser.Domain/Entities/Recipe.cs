@@ -8,10 +8,10 @@ namespace FoodAdviser.Domain.Entities;
 public class Recipe
 {
     public Guid Id { get; set; }
-    
+
     /// <summary>The ID of the user who owns this recipe.</summary>
     public Guid UserId { get; set; }
-    
+
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DishType DishType { get; set; } = DishType.Undefined;

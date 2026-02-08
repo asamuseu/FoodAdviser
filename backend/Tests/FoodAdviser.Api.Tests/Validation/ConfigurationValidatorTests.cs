@@ -22,9 +22,9 @@ public class ConfigurationValidatorTests
         };
 
         // Act & Assert
-        var exception = Record.Exception(() => 
+        var exception = Record.Exception(() =>
             ConfigurationValidator.ValidateNoPlaceholders(options, "OpenAi"));
-        
+
         Assert.Null(exception);
     }
 

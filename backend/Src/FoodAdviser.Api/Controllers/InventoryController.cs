@@ -18,7 +18,7 @@ public class InventoryController : ControllerBase
 {
     private readonly IFoodItemRepository _repo;
     private readonly ICurrentUserService _currentUserService;
-    
+
     public InventoryController(IFoodItemRepository repo, ICurrentUserService currentUserService)
     {
         _repo = repo;
@@ -33,7 +33,7 @@ public class InventoryController : ControllerBase
     {
         if (page <= 0 || pageSize <= 0)
             return BadRequest(ProblemDetailsFactory.CreateProblemDetails(HttpContext, StatusCodes.Status400BadRequest, detail: "page and pageSize must be positive"));
-        
+
         var userId = _currentUserService.GetRequiredUserId();
         var items = await _repo.GetPagedAsync(page, pageSize, userId, ct);
         var result = items.Select(item => item.ToDto()).ToList();
@@ -62,7 +62,7 @@ public class InventoryController : ControllerBase
             };
             return BadRequest(problemDetails);
         }
-        
+
         var userId = _currentUserService.GetRequiredUserId();
         var entity = dto.ToEntity(userId);
         entity.Id = Guid.NewGuid();
@@ -76,13 +76,13 @@ public class InventoryController : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] FoodItemDto dto, CancellationToken ct)
     {
         if (id != dto.Id) return BadRequest(ProblemDetailsFactory.CreateProblemDetails(HttpContext, StatusCodes.Status400BadRequest, detail: "Id mismatch"));
-        
+
         var userId = _currentUserService.GetRequiredUserId();
-        
+
         // Verify the item belongs to the user
         var existing = await _repo.GetByIdAsync(id, userId, ct);
         if (existing is null) return NotFound();
-        
+
         var entity = dto.ToEntity(userId);
         await _repo.UpdateAsync(entity, ct);
         return NoContent();

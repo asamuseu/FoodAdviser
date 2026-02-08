@@ -19,14 +19,14 @@ public class OpenAiServiceTests
     public OpenAiServiceTests()
     {
         _logger = Substitute.For<ILogger<OpenAiService>>();
-        
+
         _options = new OpenAiOptions
         {
             ApiKey = "test-api-key",
             Model = "gpt-4",
             TimeoutSeconds = 60
         };
-        
+
         _httpClient = new HttpClient();
     }
 
@@ -88,9 +88,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAnyAsync<Exception>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.MainCourse, 
-                2, 
+                foodItems,
+                DishType.MainCourse,
+                2,
                 1));
     }
 
@@ -116,9 +116,9 @@ public class OpenAiServiceTests
         // but it proves the service can handle different dish types
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                dishType, 
-                2, 
+                foodItems,
+                dishType,
+                2,
                 1));
     }
 
@@ -141,9 +141,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.MainCourse, 
-                2, 
+                foodItems,
+                DishType.MainCourse,
+                2,
                 recipeCount));
     }
 
@@ -166,9 +166,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.MainCourse, 
-                numberOfPersons, 
+                foodItems,
+                DishType.MainCourse,
+                numberOfPersons,
                 1));
     }
 
@@ -190,9 +190,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.MainCourse, 
-                2, 
+                foodItems,
+                DishType.MainCourse,
+                2,
                 1));
     }
 
@@ -209,9 +209,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.MainCourse, 
-                2, 
+                foodItems,
+                DishType.MainCourse,
+                2,
                 1));
     }
 
@@ -234,10 +234,10 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.MainCourse, 
-                2, 
-                1, 
+                foodItems,
+                DishType.MainCourse,
+                2,
+                1,
                 cts.Token));
     }
 
@@ -261,9 +261,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.Salad, 
-                2, 
+                foodItems,
+                DishType.Salad,
+                2,
                 1));
     }
 
@@ -284,9 +284,9 @@ public class OpenAiServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await service.GenerateRecipesAsync(
-                foodItems, 
-                DishType.Dessert, 
-                2, 
+                foodItems,
+                DishType.Dessert,
+                2,
                 1));
     }
 }

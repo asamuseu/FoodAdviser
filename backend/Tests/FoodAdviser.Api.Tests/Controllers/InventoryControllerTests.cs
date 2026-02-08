@@ -23,13 +23,13 @@ public class InventoryControllerTests
         _currentUserService = Substitute.For<ICurrentUserService>();
         _userId = Guid.NewGuid();
         _currentUserService.GetRequiredUserId().Returns(_userId);
-        
+
         _controller = new InventoryController(_repository, _currentUserService);
         _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()
         };
-        
+
         // Setup ProblemDetailsFactory
         var problemDetailsFactory = Substitute.For<ProblemDetailsFactory>();
         problemDetailsFactory.CreateProblemDetails(
@@ -167,7 +167,7 @@ public class InventoryControllerTests
     {
         // Arrange
         var itemId = Guid.NewGuid();
-        
+
         // Item exists but belongs to another user - repository returns null
         _repository.GetByIdAsync(itemId, _userId, Arg.Any<CancellationToken>())
             .Returns((FoodItem?)null);

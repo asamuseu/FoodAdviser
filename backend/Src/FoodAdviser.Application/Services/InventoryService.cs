@@ -59,7 +59,7 @@ public class InventoryService : IInventoryService
 
         // Step 2: Aggregate all ingredients from all recipes
         var ingredientUsage = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-        
+
         foreach (var recipe in recipes)
         {
             foreach (var ingredient in recipe.Ingredients)
@@ -110,8 +110,8 @@ public class InventoryService : IInventoryService
 
         if (insufficientIngredients.Count > 0)
         {
-            var insufficient = string.Join("; ", 
-                insufficientIngredients.Select(i => 
+            var insufficient = string.Join("; ",
+                insufficientIngredients.Select(i =>
                     $"{i.Name} (required: {i.Required}, available: {i.Available})"));
             _logger.LogWarning("Insufficient ingredient quantities: {InsufficientIngredients}", insufficient);
             throw new InvalidOperationException(

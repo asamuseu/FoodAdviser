@@ -24,10 +24,10 @@ public class JwtTokenServiceTests
             ExpirationMinutes = 60,
             RefreshTokenExpirationDays = 7
         };
-        
+
         var optionsWrapper = Substitute.For<IOptions<JwtOptions>>();
         optionsWrapper.Value.Returns(_jwtOptions);
-        
+
         _sut = new JwtTokenService(optionsWrapper);
     }
 
@@ -59,10 +59,10 @@ public class JwtTokenServiceTests
 
         // Assert
         Assert.False(string.IsNullOrEmpty(token));
-        
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         Assert.Equal(_jwtOptions.Issuer, jwtToken.Issuer);
         Assert.Contains(jwtToken.Audiences, a => a == _jwtOptions.Audience);
         Assert.Contains(jwtToken.Claims, c => c.Type == "userId" && c.Value == user.Id.ToString());
@@ -89,7 +89,7 @@ public class JwtTokenServiceTests
         // Assert
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
         Assert.Equal(3, roleClaims.Count);
         Assert.Contains("User", roleClaims);
@@ -114,7 +114,7 @@ public class JwtTokenServiceTests
         // Assert
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();
         Assert.Empty(roleClaims);
     }
@@ -138,7 +138,7 @@ public class JwtTokenServiceTests
         // Assert
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         Assert.DoesNotContain(jwtToken.Claims, c => c.Type == "firstName");
     }
 
@@ -161,7 +161,7 @@ public class JwtTokenServiceTests
         // Assert
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         Assert.DoesNotContain(jwtToken.Claims, c => c.Type == "lastName");
     }
 
@@ -182,7 +182,7 @@ public class JwtTokenServiceTests
         // Assert
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         Assert.True(jwtToken.ValidTo > DateTime.UtcNow);
         Assert.True(jwtToken.ValidTo <= DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationMinutes + 1));
     }
@@ -236,7 +236,7 @@ public class JwtTokenServiceTests
         var afterCall = DateTime.UtcNow;
         var expectedMin = beforeCall.AddMinutes(_jwtOptions.ExpirationMinutes);
         var expectedMax = afterCall.AddMinutes(_jwtOptions.ExpirationMinutes);
-        
+
         Assert.InRange(expiration, expectedMin, expectedMax);
     }
 
@@ -253,7 +253,7 @@ public class JwtTokenServiceTests
         var afterCall = DateTime.UtcNow;
         var expectedMin = beforeCall.AddDays(_jwtOptions.RefreshTokenExpirationDays);
         var expectedMax = afterCall.AddDays(_jwtOptions.RefreshTokenExpirationDays);
-        
+
         Assert.InRange(expiration, expectedMin, expectedMax);
     }
 
@@ -290,7 +290,7 @@ public class JwtTokenServiceTests
             ExpirationMinutes = -1, // Expired
             RefreshTokenExpirationDays = 7
         };
-        
+
         var optionsWrapper = Substitute.For<IOptions<JwtOptions>>();
         optionsWrapper.Value.Returns(shortExpirationOptions);
         var service = new JwtTokenService(optionsWrapper);
@@ -361,7 +361,7 @@ public class JwtTokenServiceTests
             ExpirationMinutes = 60,
             RefreshTokenExpirationDays = 7
         };
-        
+
         var optionsWrapper = Substitute.For<IOptions<JwtOptions>>();
         optionsWrapper.Value.Returns(differentOptions);
         var differentService = new JwtTokenService(optionsWrapper);
@@ -392,7 +392,7 @@ public class JwtTokenServiceTests
             ExpirationMinutes = 60,
             RefreshTokenExpirationDays = 7
         };
-        
+
         var optionsWrapper = Substitute.For<IOptions<JwtOptions>>();
         optionsWrapper.Value.Returns(differentOptions);
         var differentService = new JwtTokenService(optionsWrapper);

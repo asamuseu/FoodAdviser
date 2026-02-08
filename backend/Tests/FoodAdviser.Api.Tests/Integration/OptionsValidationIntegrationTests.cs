@@ -56,7 +56,7 @@ public class OptionsValidationIntegrationTests
         var serviceProvider = services.BuildServiceProvider();
 
         // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => 
+        var exception = Assert.Throws<InvalidOperationException>(() =>
             serviceProvider.ValidateAllOptions());
 
         Assert.Contains("Configuration validation failed", exception.Message);
@@ -143,7 +143,7 @@ public class OptionsValidationIntegrationTests
         // Act & Assert
         var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<ReceiptAnalyzerOptions>>();
         var exception = Assert.Throws<OptionsValidationException>(() => optionsMonitor.CurrentValue);
-        
+
         Assert.Contains("ReceiptAnalyzer.ClientId", exception.Message);
     }
 }

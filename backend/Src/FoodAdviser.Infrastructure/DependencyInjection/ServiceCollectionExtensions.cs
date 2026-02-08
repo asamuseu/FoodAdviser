@@ -57,7 +57,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        
+
         return services;
     }
 
@@ -118,7 +118,7 @@ public static class ServiceCollectionExtensions
         var jwtSection = configuration.GetSection("Jwt");
         services.Configure<JwtOptions>(jwtSection);
 
-        var jwtOptions = jwtSection.Get<JwtOptions>() 
+        var jwtOptions = jwtSection.Get<JwtOptions>()
             ?? throw new InvalidOperationException("JWT configuration is missing. Please configure the 'Jwt' section in appsettings.");
 
         services.AddAuthentication(options =>

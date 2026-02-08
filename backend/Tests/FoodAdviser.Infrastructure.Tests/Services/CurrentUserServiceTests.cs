@@ -18,7 +18,7 @@ public class CurrentUserServiceTests
         _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         _httpContext = new DefaultHttpContext();
         _httpContextAccessor.HttpContext.Returns(_httpContext);
-        
+
         _sut = new CurrentUserService(_httpContextAccessor);
     }
 
@@ -115,7 +115,7 @@ public class CurrentUserServiceTests
         var userIdValue = Guid.NewGuid();
         var nameIdentifierValue = Guid.NewGuid();
         var subValue = Guid.NewGuid();
-        
+
         var claims = new List<Claim>
         {
             new("userId", userIdValue.ToString()),

@@ -19,7 +19,7 @@ public class OpenAiService : IAiRecipeService
     private readonly HttpClient _httpClient;
     private readonly ILogger<OpenAiService> _logger;
     private readonly OpenAiOptions _options;
-    
+
     /// <inheritdoc />
     public string ProviderName => "OpenAI";
     private static readonly JsonSerializerOptions JsonOptions = new()

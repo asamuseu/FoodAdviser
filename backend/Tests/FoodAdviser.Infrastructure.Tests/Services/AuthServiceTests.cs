@@ -27,27 +27,27 @@ public class AuthServiceTests
         var userStore = Substitute.For<IUserStore<ApplicationUser>>();
         _userManager = Substitute.For<UserManager<ApplicationUser>>(
             userStore, null, null, null, null, null, null, null, null);
-        
+
         // Mock SignInManager
         var contextAccessor = Substitute.For<IHttpContextAccessor>();
         var claimsFactory = Substitute.For<IUserClaimsPrincipalFactory<ApplicationUser>>();
         _signInManager = Substitute.For<SignInManager<ApplicationUser>>(
             _userManager, contextAccessor, claimsFactory, null, null, null, null);
-        
+
         _jwtTokenService = Substitute.For<IJwtTokenService>();
         _refreshTokenRepository = Substitute.For<IRefreshTokenRepository>();
         _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
-        
+
         // Setup default HTTP context
         var httpContext = new DefaultHttpContext();
         httpContext.Connection.RemoteIpAddress = System.Net.IPAddress.Parse("127.0.0.1");
         _httpContextAccessor.HttpContext.Returns(httpContext);
-        
+
         _sut = new AuthService(
-            _userManager, 
-            _signInManager, 
-            _jwtTokenService, 
-            _refreshTokenRepository, 
+            _userManager,
+            _signInManager,
+            _jwtTokenService,
+            _refreshTokenRepository,
             _httpContextAccessor);
     }
 
@@ -98,8 +98,8 @@ public class AuthServiceTests
         Assert.Equal(request.LastName, response.LastName);
 
         await _userManager.Received(1).CreateAsync(
-            Arg.Is<ApplicationUser>(u => 
-                u.Email == request.Email && 
+            Arg.Is<ApplicationUser>(u =>
+                u.Email == request.Email &&
                 u.UserName == request.Email &&
                 u.FirstName == request.FirstName &&
                 u.LastName == request.LastName),
@@ -358,8 +358,8 @@ public class AuthServiceTests
         Assert.Equal(user.Email, response.Email);
 
         await _refreshTokenRepository.Received(1).UpdateAsync(
-            Arg.Is<RefreshToken>(t => 
-                t.Token == oldToken && 
+            Arg.Is<RefreshToken>(t =>
+                t.Token == oldToken &&
                 t.RevokedAt != null &&
                 t.ReplacedByToken == newRefreshToken));
     }
@@ -488,8 +488,8 @@ public class AuthServiceTests
 
         // Assert
         await _refreshTokenRepository.Received(1).AddAsync(
-            Arg.Is<RefreshToken>(t => 
-                t.Token == newRefreshToken && 
+            Arg.Is<RefreshToken>(t =>
+                t.Token == newRefreshToken &&
                 t.UserId == user.Id));
     }
 

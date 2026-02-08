@@ -24,7 +24,7 @@ public interface IAiRecipeService
         int numberOfPersons,
         int recipeCount,
         CancellationToken ct = default);
-    
+
     /// <summary>
     /// Gets the name of the AI provider.
     /// </summary>

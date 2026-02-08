@@ -64,9 +64,9 @@ public class InventoryServiceTests
         Assert.True(result.Success);
         Assert.Equal(recipes.Count, result.ConfirmedRecipesCount);
         Assert.NotEmpty(result.InventoryUpdates);
-        
+
         await _foodItemRepository.Received(1).UpdateRangeAsync(
-            Arg.Is<List<FoodItem>>(items => items.All(item => item.Quantity >= 0)), 
+            Arg.Is<List<FoodItem>>(items => items.All(item => item.Quantity >= 0)),
             cancellationToken);
     }
 
@@ -83,7 +83,7 @@ public class InventoryServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ConfirmRecipesAsync(recipeIds, cancellationToken));
-        
+
         Assert.Equal("No recipes found for the provided IDs.", exception.Message);
     }
 
@@ -106,7 +106,7 @@ public class InventoryServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ConfirmRecipesAsync(recipeIds, cancellationToken));
-        
+
         Assert.Contains("The following recipe IDs were not found:", exception.Message);
     }
 
@@ -134,7 +134,7 @@ public class InventoryServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ConfirmRecipesAsync(recipeIds, cancellationToken));
-        
+
         Assert.Contains("The following ingredients are not in your inventory:", exception.Message);
     }
 
@@ -167,7 +167,7 @@ public class InventoryServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ConfirmRecipesAsync(recipeIds, cancellationToken));
-        
+
         Assert.Contains("Insufficient quantities for the following ingredients:", exception.Message);
     }
 
@@ -221,7 +221,7 @@ public class InventoryServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ConfirmRecipesAsync(recipeIds, cancellationToken));
-        
+
         Assert.Equal(expectedException.Message, exception.Message);
     }
 }

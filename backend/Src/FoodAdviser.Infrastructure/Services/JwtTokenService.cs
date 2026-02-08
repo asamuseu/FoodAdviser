@@ -21,7 +21,7 @@ public class JwtTokenService : IJwtTokenService
     public JwtTokenService(IOptions<JwtOptions> jwtOptions)
     {
         _jwtOptions = jwtOptions.Value;
-        
+
         // Set up token validation parameters
         _tokenValidationParameters = new TokenValidationParameters
         {
@@ -107,7 +107,7 @@ public class JwtTokenService : IJwtTokenService
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, _tokenValidationParameters, out var validatedToken);
-            
+
             // Ensure the token is a JWT and uses the correct algorithm
             if (validatedToken is not JwtSecurityToken jwtToken ||
                 !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))

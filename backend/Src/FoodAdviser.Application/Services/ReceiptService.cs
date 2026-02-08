@@ -45,7 +45,7 @@ public class ReceiptService : IReceiptService
     public async Task<ReceiptDto> UploadAndAnalyzeReceiptAsync(IFormFile file, CancellationToken cancellationToken = default)
     {
         var userId = _currentUserService.GetRequiredUserId();
-        
+
         var baseTemp = _storageOptions.ReceiptTempPath ?? Path.Combine(Path.GetTempPath(), "FoodAdviser", "receipts");
         Directory.CreateDirectory(baseTemp);
         var ext = Path.GetExtension(file.FileName ?? string.Empty);
@@ -60,18 +60,18 @@ public class ReceiptService : IReceiptService
 
             _logger.LogInformation("User {UserId} analyzing receipt from file: {FileName}", userId, file.FileName);
             var receipt = await _analyzer.AnalyzeAsync(tempFile, cancellationToken);
-            
+
             // Set the user ID on the receipt
             receipt.UserId = userId;
-            
+
             var added = await _repository.AddAsync(receipt, cancellationToken);
             _logger.LogInformation("Receipt {ReceiptId} successfully persisted for user {UserId}", added.Id, userId);
-            
+
             var receiptDto = _mapper.Map<ReceiptDto>(added);
-            
+
             // Update food inventory based on receipt items
             await UpdateFoodInventoryAsync(receiptDto.Items, userId, cancellationToken);
-            
+
             return receiptDto;
         }
         catch (Exception ex)
@@ -123,13 +123,13 @@ public class ReceiptService : IReceiptService
                 {
                     // Item exists - increment quantity
                     existingFoodItem.Quantity += item.Quantity;
-                    
+
                     // Update unit if provided and existing item has no unit
                     if (!string.IsNullOrWhiteSpace(item.Unit) && string.IsNullOrWhiteSpace(existingFoodItem.Unit))
                     {
                         existingFoodItem.Unit = item.Unit;
                     }
-                    
+
                     await _foodItemRepository.UpdateAsync(existingFoodItem, cancellationToken);
                     _logger.LogInformation(
                         "Updated food item '{Name}' quantity for user {UserId}. New quantity: {Quantity}",
@@ -148,7 +148,7 @@ public class ReceiptService : IReceiptService
                         Quantity = item.Quantity,
                         Unit = item.Unit ?? string.Empty
                     };
-                    
+
                     await _foodItemRepository.AddAsync(newFoodItem, cancellationToken);
                     _logger.LogInformation(
                         "Added new food item '{Name}' to inventory for user {UserId} with quantity: {Quantity}",

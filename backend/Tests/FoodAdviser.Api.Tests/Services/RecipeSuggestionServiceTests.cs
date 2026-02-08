@@ -43,7 +43,7 @@ public class RecipeSuggestionServiceTests
 
         // Setup default options
         _options.Value.Returns(new RecipeSuggestionOptions { DefaultRecipeCount = 3 });
-        
+
         // Setup AI service factory
         _aiRecipeServiceFactory.GetService().Returns(_aiRecipeService);
         _aiRecipeService.ProviderName.Returns("TestAI");
@@ -79,7 +79,7 @@ public class RecipeSuggestionServiceTests
             .ToList();
 
         var savedRecipes = generatedRecipes.ToList(); // Simulate saved recipes
-        
+
         var recipeDtos = generatedRecipes.Select(r => _fixture.Build<RecipeDto>()
             .With(dto => dto.Id, r.Id)
             .With(dto => dto.DishType, r.DishType)
@@ -103,14 +103,14 @@ public class RecipeSuggestionServiceTests
         Assert.NotNull(result);
         Assert.Equal(3, result.Count);
         Assert.All(result, dto => Assert.Equal(dishType, dto.DishType));
-        
+
         await _aiRecipeService.Received(1).GenerateRecipesAsync(
             availableItems,
             dishType,
             numberOfPersons,
             3,
             cancellationToken);
-        
+
         await _recipeRepository.Received(1).AddRangeAsync(
             Arg.Is<List<Recipe>>(recipes => recipes.All(r => r.UserId == userId)),
             cancellationToken);
@@ -130,9 +130,9 @@ public class RecipeSuggestionServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.GenerateRecipeSuggestionsAsync(dishType, numberOfPersons, cancellationToken));
-        
+
         Assert.Contains("No suitable recipes could be generated. Your inventory is empty", exception.Message);
-        
+
         await _aiRecipeService.DidNotReceive().GenerateRecipesAsync(
             Arg.Any<List<FoodItem>>(),
             Arg.Any<DishType>(),
@@ -167,9 +167,9 @@ public class RecipeSuggestionServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.GenerateRecipeSuggestionsAsync(dishType, numberOfPersons, cancellationToken));
-        
+
         Assert.Contains($"No suitable recipes could be generated for {dishType}", exception.Message);
-        
+
         await _recipeRepository.DidNotReceive().AddRangeAsync(
             Arg.Any<List<Recipe>>(),
             Arg.Any<CancellationToken>());
@@ -200,7 +200,7 @@ public class RecipeSuggestionServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.GenerateRecipeSuggestionsAsync(dishType, numberOfPersons, cancellationToken));
-        
+
         Assert.Equal(expectedException.Message, exception.Message);
     }
 
@@ -290,11 +290,11 @@ public class RecipeSuggestionServiceTests
         // Arrange
         const int configuredRecipeCount = 5;
         const DishType dishType = DishType.MainCourse;
-        
+
         // Create a new options instance with custom recipe count
         var customOptions = Substitute.For<IOptions<RecipeSuggestionOptions>>();
         customOptions.Value.Returns(new RecipeSuggestionOptions { DefaultRecipeCount = configuredRecipeCount });
-        
+
         // Create a new service instance with the custom options
         var customSut = new RecipeSuggestionService(
             _foodItemRepository,
@@ -304,7 +304,7 @@ public class RecipeSuggestionServiceTests
             _mapper,
             _logger,
             customOptions);
-        
+
         var availableItems = _fixture.CreateMany<FoodItem>(3).ToList();
         var generatedRecipes = _fixture.CreateMany<Recipe>(configuredRecipeCount).ToList();
 

@@ -40,18 +40,18 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
                     File_name = Path.GetFileName(imagePath),
                     File_data = Convert.ToBase64String(bytes)
                 };
-                
+
                 // var document = await api.ProcessDocumentAsync(
                 //     new DocumentUploadOptionsV7() {
                 //         File_name = "fileName.jpg",
                 //         File_data = Convert.ToBase64String(bytes),
                 //     }, cancellationToken);
-                
+
                 var documentResponse = await api.Documents2Async(request, cancellationToken: cancellationToken);
-                
+
                 var json = documentResponse.ToString();
-                var document =  JsonConvert.DeserializeObject<Document>(json, JsonSettings) ?? new Document();
-                
+                var document = JsonConvert.DeserializeObject<Document>(json, JsonSettings) ?? new Document();
+
                 return MapToDomain(document);
             }
             catch (OperationCanceledException)
@@ -72,18 +72,18 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
         if (document == null)
         {
             return null;
-        } 
-        
+        }
+
         var items = new List<ReceiptLineItem>();
         if (document.Line_items != null)
         {
             foreach (var li in document.Line_items)
             {
-                if(li.Type != LineItemType.Food)
+                if (li.Type != LineItemType.Food)
                 {
                     continue;
                 }
-                
+
                 items.Add(new ReceiptLineItem
                 {
                     Id = Guid.NewGuid(),
@@ -101,7 +101,7 @@ public class ReceiptAnalyzerService : IReceiptAnalyzerService
             Items = items
         };
     }
-    
+
     private static readonly JsonSerializerSettings JsonSettings = new()
     {
         NullValueHandling = NullValueHandling.Ignore,

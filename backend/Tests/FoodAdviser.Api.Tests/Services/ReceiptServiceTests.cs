@@ -43,9 +43,9 @@ public class ReceiptServiceTests : IDisposable
         // Set up temp directory for tests
         _tempDirectory = Path.Combine(Path.GetTempPath(), "FoodAdviser_Tests", Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDirectory);
-        
+
         _storageOptions.Value.Returns(new StorageOptions { ReceiptTempPath = _tempDirectory });
-        
+
         _sut = new ReceiptService(_analyzer, _repository, _foodItemRepository, _currentUserService, _mapper, _storageOptions, _logger);
     }
 
@@ -57,7 +57,7 @@ public class ReceiptServiceTests : IDisposable
         // Arrange
         var fileName = "test_receipt.jpg";
         var fileContent = "fake image content"u8.ToArray();
-        
+
         var formFile = CreateMockFormFile(fileName, fileContent);
         var analyzedReceipt = CreateSampleReceipt(userId);
         var receiptDto = CreateSampleReceiptDto();
@@ -76,10 +76,10 @@ public class ReceiptServiceTests : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(receiptDto.Id, result.Id);
-        
+
         await _analyzer.Received(1).AnalyzeAsync(Arg.Any<string>(), cancellationToken);
         await _repository.Received(1).AddAsync(Arg.Is<Receipt>(r => r.UserId == userId), cancellationToken);
-        
+
         // Verify food items were added for each receipt item
         await _foodItemRepository.Received(receiptDto.Items.Count).AddAsync(Arg.Any<FoodItem>(), cancellationToken);
     }
@@ -93,7 +93,7 @@ public class ReceiptServiceTests : IDisposable
         var formFile = CreateMockFormFile("test.jpg", "content"u8.ToArray());
         var analyzedReceipt = CreateSampleReceipt(userId);
         var receiptDto = CreateSampleReceiptDto();
-        
+
         var existingFoodItem = new FoodItem
         {
             Id = Guid.NewGuid(),
@@ -115,11 +115,11 @@ public class ReceiptServiceTests : IDisposable
 
         // Assert
         await _foodItemRepository.Received(1).UpdateAsync(
-            Arg.Is<FoodItem>(item => 
-                item.Name == existingFoodItem.Name && 
-                item.Quantity > existingFoodItem.Quantity - receiptDto.Items.First().Quantity), 
+            Arg.Is<FoodItem>(item =>
+                item.Name == existingFoodItem.Name &&
+                item.Quantity > existingFoodItem.Quantity - receiptDto.Items.First().Quantity),
             cancellationToken);
-        
+
         // Other items should be added as new
         await _foodItemRepository.Received(receiptDto.Items.Count - 1).AddAsync(Arg.Any<FoodItem>(), cancellationToken);
     }
@@ -139,7 +139,7 @@ public class ReceiptServiceTests : IDisposable
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.UploadAndAnalyzeReceiptAsync(formFile, cancellationToken));
-        
+
         Assert.Equal(expectedException.Message, exception.Message);
     }
 
@@ -193,7 +193,7 @@ public class ReceiptServiceTests : IDisposable
 
         _currentUserService.GetRequiredUserId().Returns(userId);
         _repository.GetRecentAsync(count, userId, cancellationToken).Returns(receipts);
-        
+
         foreach (var (receipt, dto) in receipts.Zip(receiptDtos))
         {
             _mapper.Map<ReceiptDto>(receipt).Returns(dto);
@@ -221,7 +221,7 @@ public class ReceiptServiceTests : IDisposable
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.GetRecentReceiptsAsync(count, cancellationToken));
-        
+
         Assert.Equal(expectedException.Message, exception.Message);
     }
 
@@ -230,7 +230,7 @@ public class ReceiptServiceTests : IDisposable
         var formFile = Substitute.For<IFormFile>();
         formFile.FileName.Returns(fileName);
         formFile.Length.Returns(content.Length);
-        
+
         formFile.CopyToAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>())
             .Returns(async (callInfo) =>
             {

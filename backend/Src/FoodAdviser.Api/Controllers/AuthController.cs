@@ -112,7 +112,7 @@ public class AuthController : ControllerBase
     public IActionResult GetCurrentUser()
     {
         var userId = User.FindFirst("userId")?.Value;
-        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
             ?? User.FindFirst("email")?.Value;
         var firstName = User.FindFirst("firstName")?.Value;
         var lastName = User.FindFirst("lastName")?.Value;

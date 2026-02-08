@@ -9,7 +9,7 @@ namespace FoodAdviser.Domain.Repositories;
 public interface IFoodItemRepository
 {
     Task<FoodItem?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct = default);
-    
+
     /// <summary>
     /// Gets a food item by its name (case-insensitive) for a specific user.
     /// </summary>
@@ -18,7 +18,7 @@ public interface IFoodItemRepository
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The food item if found; otherwise, null.</returns>
     Task<FoodItem?> GetByNameAsync(string name, Guid userId, CancellationToken ct = default);
-    
+
     Task<IReadOnlyList<FoodItem>> GetPagedAsync(int page, int pageSize, Guid userId, CancellationToken ct = default);
     Task<FoodItem> AddAsync(FoodItem item, CancellationToken ct = default);
     Task UpdateAsync(FoodItem item, CancellationToken ct = default);

@@ -17,7 +17,7 @@ public class ReceiptAnalyzerServiceTests
     public ReceiptAnalyzerServiceTests()
     {
         _logger = Substitute.For<ILogger<ReceiptAnalyzerService>>();
-        
+
         _options = new ReceiptAnalyzerOptions
         {
             Username = "test-username",
@@ -27,10 +27,10 @@ public class ReceiptAnalyzerServiceTests
             RetryDelayMs = 100,
             TimeoutSeconds = 30
         };
-        
+
         var optionsWrapper = Substitute.For<IOptions<ReceiptAnalyzerOptions>>();
         optionsWrapper.Value.Returns(_options);
-        
+
         _sut = new ReceiptAnalyzerService(optionsWrapper, _logger);
     }
 
@@ -121,7 +121,7 @@ public class ReceiptAnalyzerServiceTests
             // Veryfi API will throw exception with invalid credentials
             await Assert.ThrowsAnyAsync<Exception>(
                 async () => await _sut.AnalyzeAsync(tempFile));
-            
+
             // Note: In a real scenario with actual retry logic monitoring,
             // we would verify the exact number of retry attempts
         }

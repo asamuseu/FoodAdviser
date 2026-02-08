@@ -46,6 +46,6 @@ public class CurrentUserService : ICurrentUserService
     }
 
     /// <inheritdoc />
-    public bool IsAuthenticated => 
+    public bool IsAuthenticated =>
         _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 }

@@ -6,10 +6,10 @@ namespace FoodAdviser.Domain.Entities;
 public class Receipt
 {
     public Guid Id { get; set; }
-    
+
     /// <summary>The ID of the user who owns this receipt.</summary>
     public Guid UserId { get; set; }
-    
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public List<ReceiptLineItem> Items { get; set; } = new();
 }

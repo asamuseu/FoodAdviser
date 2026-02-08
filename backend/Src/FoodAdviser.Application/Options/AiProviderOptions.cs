@@ -21,7 +21,7 @@ public enum AiProvider
     /// OpenAI provider (GPT models).
     /// </summary>
     OpenAi,
-    
+
     /// <summary>
     /// DeepSeek provider.
     /// </summary>

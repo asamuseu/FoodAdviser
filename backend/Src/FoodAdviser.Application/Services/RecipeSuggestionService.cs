@@ -51,7 +51,7 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         CancellationToken ct = default)
     {
         var userId = _currentUserService.GetRequiredUserId();
-        
+
         _logger.LogInformation(
             "User {UserId} generating recipe suggestions for DishType={DishType}, NumberOfPersons={NumberOfPersons}",
             userId, dishType, numberOfPersons);
@@ -71,7 +71,7 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         // Step 2: Get the configured AI service and generate recipes
         var aiService = _aiRecipeServiceFactory.GetService();
         _logger.LogInformation("Using AI provider: {Provider}", aiService.ProviderName);
-        
+
         var recipeCount = _options.DefaultRecipeCount;
         var generatedRecipes = await aiService.GenerateRecipesAsync(
             availableItems,
@@ -97,7 +97,7 @@ public class RecipeSuggestionService : IRecipeSuggestionService
         {
             recipe.UserId = userId;
         }
-        
+
         var savedRecipes = await _recipeRepository.AddRangeAsync(generatedRecipes, ct);
 
         _logger.LogInformation("Saved {Count} recipes to database for user {UserId}", savedRecipes.Count, userId);
