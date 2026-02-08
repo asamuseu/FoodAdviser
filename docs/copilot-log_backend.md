@@ -79,3 +79,36 @@ Constraints:
 Remove Mappings from the controller to dedicated file
 
 Move all interfeces from the Services folder to 'Services/Interfaces'
+
+Create a universal configuration validator for a .NET 10 Web API project.
+Context:
+I have multiple configuration sections in appsettings.json (ConnectionStrings, Jwt, ReceiptAnalyzer, Storage, OpenAi, etc.).
+Some sensitive values are injected at runtime from a secrets manager.
+In appsettings they are temporarily stored as the placeholder:
+{injected-from-secrets-manager}
+Task:
+Implement a universal validation mechanism that will:
+Scan all configuration sections after binding to strongly typed settings classes.
+Detect any property whose value equals the placeholder string:{injected-from-secrets-manager}
+If at least one such value is found — throw an exception at application startup.
+The exception message must clearly indicate:
+- Which configuration section failed
+- Which property is invalid
+- That the secret was not injected
+Example message:
+"Configuration validation failed: Secret value for 'Jwt.SecretKey' was not injected from Secrets Manager."
+Technical requirements:
+- Use Options pattern (IOptions / IOptionsMonitor).
+- Work with multiple settings classes automatically (not hard-coded per class).
+- Support nested objects if present.
+- Run validation during application startup (Program.cs).
+- Follow best practices for .NET configuration validation.
+- Make the placeholder string a constant.
+- Ensure the validator is easily extendable for future rules.
+Deliverables:
+- Validator implementation class.
+- Example of registering and using it in Program.cs.
+- Example settings classes if needed for demonstration.
+Code must be production-ready and cleanly structured.
+
+Add unit tests for controllers and services. Use xunit and if it is needed AutoFixture, NSubstitute. Follow best practices for testing.

@@ -34,11 +34,12 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddApplicationOptions(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<StorageOptions>(configuration.GetSection("Storage"));
-        services.Configure<ReceiptAnalyzerOptions>(configuration.GetSection("ReceiptAnalyzer"));
-        services.Configure<OpenAiOptions>(configuration.GetSection("OpenAi"));
-        services.Configure<AiProviderOptions>(configuration.GetSection("AiProvider"));
-        services.Configure<RecipeSuggestionOptions>(configuration.GetSection("RecipeSuggestion"));
+        // Register options with automatic validation for secret placeholders
+        services.ConfigureAndValidate<StorageOptions>(configuration, "Storage");
+        services.ConfigureAndValidate<ReceiptAnalyzerOptions>(configuration, "ReceiptAnalyzer");
+        services.ConfigureAndValidate<OpenAiOptions>(configuration, "OpenAi");
+        services.ConfigureAndValidate<AiProviderOptions>(configuration, "AiProvider");
+        services.ConfigureAndValidate<RecipeSuggestionOptions>(configuration, "RecipeSuggestion");
 
         return services;
     }

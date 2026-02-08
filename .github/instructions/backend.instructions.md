@@ -1,4 +1,7 @@
 # Copilot Instructions for FoodAdviser (ASP.NET Core, .NET 10)
+---
+applyTo: "backend/**"
+---
 
 Purpose: Ensure generated code aligns with the project's architectural and quality standards for a FoodAdviser application that manages food inventory, analyzes shopping receipts, and suggests recipes based on available ingredients and portions.
 
@@ -21,7 +24,7 @@ Core Guidelines
 
 - Follow Best Practices
   - SOLID principles, clean architecture boundaries, and separation of concerns.
-  - Validation: Use FluentValidation or data annotations on DTOs; validate at the controller boundary.
+  - Validation: Use FluentValidation; validate at the controller boundary.
   - Error handling: Centralize with middleware; return ProblemDetails for consistent API errors.
   - Logging: Use Microsoft.Extensions.Logging with structured logs and correlation where relevant.
   - Configuration: Use options pattern (IOptions<T>) for config sections.

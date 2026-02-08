@@ -20,6 +20,9 @@ builder.Services
 
 var app = builder.Build();
 
+// Validate all configuration options at startup
+app.Services.ValidateAllOptions();
+
 // Initialize application
 await app.ApplyDatabaseMigrationsAsync();
 await app.EnsureStorageDirectoryAsync();

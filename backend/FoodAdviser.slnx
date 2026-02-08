@@ -1,11 +1,12 @@
 <Solution>
-  <Folder Name="/Src/" >
+  <Folder Name="/Src/">
     <Project Path="Src/FoodAdviser.Api/FoodAdviser.Api.csproj" />
     <Project Path="Src/FoodAdviser.Application/FoodAdviser.Application.csproj" />
     <Project Path="Src/FoodAdviser.Domain/FoodAdviser.Domain.csproj" />
     <Project Path="Src/FoodAdviser.Infrastructure/FoodAdviser.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/Tests/" >
+  <Folder Name="/Tests/">
     <Project Path="Tests/FoodAdviser.Api.Tests/FoodAdviser.Api.Tests.csproj" />
+    <Project Path="Tests/FoodAdviser.Infrastructure.Tests/FoodAdviser.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>

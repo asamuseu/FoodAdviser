@@ -54,7 +54,14 @@ public class InventoryController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<FoodItemDto>> Create([FromBody] CreateFoodItemDto dto, CancellationToken ct)
     {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        if (!ModelState.IsValid)
+        {
+            var problemDetails = new ValidationProblemDetails(ModelState)
+            {
+                Status = StatusCodes.Status400BadRequest
+            };
+            return BadRequest(problemDetails);
+        }
         
         var userId = _currentUserService.GetRequiredUserId();
         var entity = dto.ToEntity(userId);

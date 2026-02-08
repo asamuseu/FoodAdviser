@@ -39,7 +39,11 @@ public class AuthController : ControllerBase
             {
                 ModelState.AddModelError(string.Empty, error);
             }
-            return ValidationProblem(ModelState);
+            var problemDetails = new ValidationProblemDetails(ModelState)
+            {
+                Status = StatusCodes.Status400BadRequest
+            };
+            return BadRequest(problemDetails);
         }
 
         return Ok(response);

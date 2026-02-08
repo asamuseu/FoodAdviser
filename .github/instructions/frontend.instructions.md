@@ -1,5 +1,9 @@
 # Copilot Instructions — FoodAdviser Frontend (React + Vite + TypeScript)
 
+---
+applyTo: "frontend/**"
+---
+
 Base context
 - React application (Vite + TypeScript) for the FoodAdviser frontend.
 - Backend is an ASP.NET Core Web API (.NET 10) located in `backend/`.
