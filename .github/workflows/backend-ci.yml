@@ -92,7 +92,7 @@ jobs:
     name: Build Solution
     runs-on: ubuntu-latest
     needs: lint-and-format
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -169,6 +169,48 @@ jobs:
         with:
           name: coverage-files
           path: ${{ env.WORKING_DIRECTORY }}/TestResults/**/coverage.cobertura.xml
+          retention-days: 30
+
+  publish:
+    name: Publish API
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore NuGet cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: dotnet restore
+
+      - name: Publish backend API
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: |
+          dotnet publish Src/FoodAdviser.Api/FoodAdviser.Api.csproj \
+            --configuration Release \
+            --no-restore \
+            --output ./publish \
+            /p:UseAppHost=false
+
+      - name: Upload publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-api-publish
+          path: ${{ env.WORKING_DIRECTORY }}/publish
           retention-days: 30
 
   coverage-report:

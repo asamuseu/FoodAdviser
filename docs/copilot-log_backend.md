@@ -268,3 +268,19 @@ Copilot must generate:
 * Test execution with coverage collection
 * Coverage report generation
 * Artifact upload
+
+
+Update the file, add a new job:
+### 6️⃣ publish
+**Depends on:** `test`
+Purpose: Produce deployable backend API artifact.
+Steps:
+1. Checkout repository
+2. Setup .NET SDK
+3. Restore (use cache)
+4. Publish backend API project:
+5. Upload publish output as workflow artifact using `actions/upload-artifact`:
+## Expected Result
+* Deployable API binaries
+* Ready for CD or Docker build
+* Available as downloadable workflow artifact
