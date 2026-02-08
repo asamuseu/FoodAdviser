@@ -112,3 +112,159 @@ Deliverables:
 Code must be production-ready and cleanly structured.
 
 Add unit tests for controllers and services. Use xunit and if it is needed AutoFixture, NSubstitute. Follow best practices for testing.
+
+#file:backend Create a multi-stage Dockerfile at backend/Dockerfile for a .NET 10.0 API application with Clean Architecture. Use SDK image for build, ASP.NET runtime for final image, expose port 8080.
+
+-- GitHub Actions Workflow Prompt --
+Create a GitHub Actions workflow file at `.github/workflows/backend-ci.yml` for a backend project using .NET.
+## Triggers
+Run the workflow on:
+* Push to branches:
+  * `main`
+  * `develop`
+  * `feature/**`
+* Pull Requests targeting `main`
+Use **path filters** so the workflow runs only when:
+* Files inside `backend/**` change, OR
+* The workflow file itself changes
+---
+## General Requirements
+* Follow GitHub Actions and .NET CI best practices
+* Use the latest stable runner
+* Use environment variables where appropriate
+* Use concurrency control to cancel outdated runs on the same branch/PR
+* Use minimal permissions:
+---
+## Jobs Structure
+Split the workflow into multiple jobs with clear responsibilities and dependencies.
+---
+### 1️⃣ restore
+Steps:
+* Checkout repository (`actions/checkout`)
+* Setup .NET SDK:
+  * Use latest LTS
+  * Cache NuGet packages using `actions/cache`
+  * Cache path: `~/.nuget/packages`
+---
+### 2️⃣ lint-and-format
+**Depends on:** `restore`
+Steps:
+* Checkout repo
+* Setup .NET
+* Restore (using cache)
+* Run formatting check:
+* Formatting issues must fail the job
+---
+### 3️⃣ build
+**Depends on:** `lint-and-format`
+Steps:
+* Checkout repo
+* Setup .NET
+* Restore (cached)
+* Build solution:
+Requirements:
+* Treat warnings as errors
+* Do not run tests here
+---
+### 4️⃣ test
+**Depends on:** `build`
+Steps:
+* Checkout repo
+* Setup .NET
+* Restore (cached)
+Run tests with coverage enabled using Coverlet (built-in collector):
+Requirements:
+* Fail job if any test fails
+* Generate coverage files in Cobertura format
+---
+### 5️⃣ coverage-report
+**Depends on:** `test`
+Steps:
+1. Install ReportGenerator tool:
+2. Generate coverage report:
+3. Upload coverage report as workflow artifact:
+---
+## Expected Output
+Copilot must generate:
+* A complete production-ready YAML workflow
+* Proper job dependencies using `needs`
+* Optimized NuGet caching
+* Test execution with coverage collection
+* Coverage report generation
+* Artifact upload
+Create a GitHub Actions workflow file at `.github/workflows/backend-ci.yml` for a backend project using .NET.
+## Triggers
+Run the workflow on:
+* Push to branches:
+  * `main`
+  * `develop`
+  * `feature/**`
+* Pull Requests targeting `main`
+Use **path filters** so the workflow runs only when:
+* Files inside `backend/**` change, OR
+* The workflow file itself changes
+---
+## General Requirements
+* Follow GitHub Actions and .NET CI best practices
+* Use the latest stable runner
+* Use environment variables where appropriate
+* Use concurrency control to cancel outdated runs on the same branch/PR
+* Use minimal permissions:
+---
+## Jobs Structure
+Split the workflow into multiple jobs with clear responsibilities and dependencies.
+---
+### 1️⃣ restore
+Steps:
+* Checkout repository (`actions/checkout`)
+* Setup .NET SDK:
+  * Use latest LTS
+  * Cache NuGet packages using `actions/cache`
+  * Cache path: `~/.nuget/packages`
+---
+### 2️⃣ lint-and-format
+**Depends on:** `restore`
+Steps:
+* Checkout repo
+* Setup .NET
+* Restore (using cache)
+* Run formatting check:
+* Formatting issues must fail the job
+---
+### 3️⃣ build
+**Depends on:** `lint-and-format`
+Steps:
+* Checkout repo
+* Setup .NET
+* Restore (cached)
+* Build solution:
+Requirements:
+* Treat warnings as errors
+* Do not run tests here
+---
+### 4️⃣ test
+**Depends on:** `build`
+Steps:
+* Checkout repo
+* Setup .NET
+* Restore (cached)
+Run tests with coverage enabled using Coverlet (built-in collector):
+Requirements:
+* Fail job if any test fails
+* Generate coverage files in Cobertura format
+---
+### 5️⃣ coverage-report
+**Depends on:** `test`
+Steps:
+1. Install ReportGenerator tool:
+2. Generate coverage report:
+3. Upload coverage report as workflow artifact:
+---
+## Expected Output
+Copilot must generate:
+* A complete production-ready YAML workflow
+* Proper job dependencies using `needs`
+* Optimized NuGet caching
+* Test execution with coverage collection
+* Coverage report generation
+* Artifact upload
