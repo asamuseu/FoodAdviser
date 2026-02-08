@@ -3,7 +3,7 @@ import { HomePage } from './pages';
 import { ProtectedRoute } from './components';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { InventoryPage, LoginPage, ReceiptsPage, RecipesPage, RegisterPage } from './pages';
-import { IconBox, IconReceipt, IconSpark } from './components/home/icons';
+import { IconBox, IconReceipt, IconSpark } from './components/home/Icons';
 
 function NavBar() {
   const { isAuthenticated, user, logout } = useAuth();
