@@ -150,7 +150,6 @@ jobs:
           dotnet test \
             --configuration Release \
             --no-restore \
-            --no-build \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
