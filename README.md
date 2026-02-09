@@ -40,7 +40,7 @@ The application follows clean architecture principles and modern best practices 
 
 2. **Receipt Analysis**
    - Upload receipt images
-   - Automatic OCR and product extraction
+   - Automatic OCR and product extraction via [Veryfi API](https://docs.veryfi.com/)
    - Automatic inventory updates from receipts
 
 3. **Recipe Generation**
@@ -67,7 +67,9 @@ The application follows clean architecture principles and modern best practices 
 - **Authentication**: ASP.NET Core Identity + JWT
 - **API Documentation**: OpenAPI/Swagger
 - **Testing**: xUnit, NSubstitute, AutoFixture
-- **AI Integration**: OpenAI for recipe generation
+- **AI Integration**: 
+  - OpenAI for recipe generation
+  - [Veryfi](https://docs.veryfi.com/) for receipt OCR and data extraction
 
 ### Frontend
 - **Framework**: React 18
@@ -294,6 +296,10 @@ The development process and prompt history are documented for transparency and l
 - **Claude Sonnet 4.5** (Primary): Used for the majority of code generation, architecture decisions, and complex refactoring tasks
 - **GPT-5.2-Codex**: Used for specialized code generation and API contract design
 - **Claude Opus 4.5**: Used occasionally for complex architectural decisions and advanced problem-solving
+
+### External AI Services
+- **OpenAI API**: Recipe generation based on available ingredients
+- **Veryfi API**: Receipt OCR and data extraction ([Documentation](https://docs.veryfi.com/))
 
 ### Development Approach
 - **GitHub Copilot**: Integrated throughout the development process
