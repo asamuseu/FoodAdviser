@@ -24,18 +24,11 @@ RUN dotnet publish FoodAdviser.Api.csproj -c Release -o /app/publish /p:UseAppHo
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 appgroup && \
-    adduser --system --uid 1001 --ingroup appgroup appuser
-
 # Copy published files from build stage
 COPY --from=build /app/publish .
 
-# Set ownership to non-root user
-RUN chown -R appuser:appgroup /app
-
-# Switch to non-root user
-USER appuser
+# Switch to the built-in non-root user provided by the .NET base image
+USER $APP_UID
 
 # Expose port
 EXPOSE 8080
