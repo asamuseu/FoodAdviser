@@ -202,3 +202,80 @@ Technical details:
 Do not modify backend responses — adapt the frontend only.
 
 Added a delete confirmation modal and wired delete buttons to open it instead of using confirm()
+
+#file:frontend
+Create a production-ready Dockerfile at frontend/Dockerfile for a React + TypeScript application built with Vite. Use pnpm for dependencies.
+
+Create a GitHub Actions workflow file at `.github/workflows/frontend-ci.yml` for a frontend project using **React + Vite + TypeScript + pnpm**.
+The workflow must follow CI best practices, include dependent jobs, caching, artifact publishing, and Docker image build & push.
+Do NOT include any test jobs.
+
+---
+## Triggers
+Run workflow on:
+* Push to:
+  * `main`
+  * `develop`
+  * `feature/**`
+* Pull Requests targeting `main`
+Use path filters so workflow runs only when:
+* `frontend/**` changes, OR
+* Workflow file changes
+---
+## General Requirements
+* Use concurrency control to cancel outdated runs
+* Follow GitHub Actions + pnpm + Docker best practices
+---
+## Jobs Overview
+
+1. install
+2. lint-and-format (non-blocking)
+3. build
+4. publish-artifact
+5. docker-build-and-push
+Use `needs` dependencies.
+---
+## 1️⃣ install
+## 2️⃣ lint-and-format
+**Depends on:** `install`
+Must NOT block pipeline.
+Report errors but do not fail workflow.
+---
+## 3️⃣ build
+**Depends on:** `install`
+Steps:
+* Checkout
+* Setup Node
+* Setup pnpm
+* Restore deps
+### Mandatory clean step
+## 4️⃣ publish-artifact
+**Depends on:** `build`
+Upload Vite build output.
+Artifact must be deployable static build.
+---
+## 5️⃣ docker-build-and-push
+**Depends on:** `build`
+Purpose: Build and upload Docker image.
+---
+### Registry
+Use GitHub Container Registry (GHCR):
+Image must contain production build only.
+## Caching & Optimization
+* pnpm dependency cache
+* Docker layer cache (GHA)
+* Reuse install outputs
+* Avoid reinstall/build duplication
+---
+## Best Practices
+* Use `needs` dependencies
+* Fail-fast default
+* Non-blocking lint job
+* Clean before build
+* Production-only artifacts
+* Official actions only:
+  * `actions/checkout`
+  * `actions/setup-node`
+  * `pnpm/action-setup`
+  * `actions/cache`
+  * `actions/upload-artifact`

@@ -81,8 +81,8 @@ The application follows clean architecture principles and modern best practices 
 ### DevOps
 - **Containerization**: Docker (multi-stage builds)
 - **CI/CD**: GitHub Actions
-  - Backend: restore → lint → build → test → coverage → publish
-  - Frontend: install → lint → build → publish artifact → Docker build & push
+  - Backend: restore → lint (non-blocking) → build → test → coverage-report + docker (main/develop only)
+  - Frontend: install → build → publish-artifact + docker-build-and-push
 - **Container Registry**: GitHub Container Registry (GHCR)
 
 ---
@@ -212,6 +212,10 @@ docker-compose up --build
 
 ## 📝 Development Journey
 
+The development process and prompt history are documented for transparency and learning purposes:
+- [Backend Development Log](docs/propts-logs/copilot-log_backend.md)
+- [Frontend Development Log](docs/propts-logs/copilot-log-frontend.md)
+
 ### Phase 1: Backend Foundation
 **Key Steps:**
 1. ✅ Project structure setup with Clean Architecture
@@ -275,11 +279,12 @@ docker-compose up --build
 **Key Steps:**
 1. ✅ Backend Dockerfile with multi-stage build
 2. ✅ Frontend Dockerfile with pnpm
-3. ✅ Backend CI pipeline (restore → lint → build → test → coverage → publish)
-4. ✅ Frontend CI pipeline (install → lint → build → artifact → Docker)
-5. ✅ GitHub Container Registry integration
+3. ✅ Backend CI pipeline (restore → lint [non-blocking] → build → test → coverage-report + docker)
+4. ✅ Frontend CI pipeline (install → build → publish-artifact + docker-build-and-push)
+5. ✅ GitHub Container Registry integration (GHCR)
 6. ✅ Path filters for optimized workflow triggers
-7. ✅ Docker layer caching and dependency optimization
+7. ✅ Docker layer caching (GHA cache) and dependency optimization
+8. ✅ Concurrency control to cancel outdated runs
 
 ---
 
@@ -420,8 +425,11 @@ docker-compose up --build
 4. **CI/CD Pipeline**
    - Separate workflows for backend and frontend allowed parallel development
    - Path filters prevented unnecessary builds
-   - Docker layer caching significantly reduced build times
+   - Docker layer caching (GitHub Actions cache) significantly reduced build times
    - Artifact publishing enabled easy deployment
+   - Concurrency control (cancel-in-progress) optimized resource usage
+   - Non-blocking lint job prevented pipeline failures on formatting issues
+   - Docker builds only on main/develop branches for backend
 
 5. **Frontend Architecture**
    - Modular CSS organization improved maintainability
@@ -444,8 +452,8 @@ This project was developed primarily using AI-assisted coding with:
 - GPT-5.2-Codex (OpenAI)
 - Claude Opus 4.5 (Anthropic)
 
-The development process and prompt history are documented in `docs/propts-logs/` for transparency and learning purposes.
+The development process and prompt history are documented for transparency and learning purposes:
+- [Backend Development Log](docs/propts-logs/copilot-log_backend.md)
+- [Frontend Development Log](docs/propts-logs/copilot-log-frontend.md)
 
 ---
-
-**Built with ❤️ and AI assistance in 2026**
