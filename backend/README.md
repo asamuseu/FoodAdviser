@@ -1,12 +1,13 @@
-# FoodAdviser
+# FoodAdviser Backend
 
-FoodAdviser is an ASP.NET Core (.NET 10) application that manages food inventory, analyzes shopping receipts, and suggests recipes based on available ingredients and portions.
+FoodAdviser is an ASP.NET Core (.NET 10) application that manages food inventory, analyzes shopping receipts using AI, and suggests recipes based on available ingredients and portions. The application includes JWT-based authentication and integrates with OpenAI for intelligent recipe suggestions.
 
 ## Contributing Guidance
 
 Please review our development guidelines before opening pull requests or generating code with AI assistants:
 
-- Copilot Instructions: See `.github/copilot-instructions.md` for architectural requirements (Controllers for API endpoints, Dependency Injection, Repository Pattern, DTOs, XML summary comments, one-class-per-file organization, and always show a plan first).
+- **Copilot Instructions**: See `.github/copilot-instructions.md` for architectural requirements
+- **Backend Guidelines**: See `.github/instructions/backend.instructions.md` for detailed backend development rules (Controllers, DI, Repository Pattern, DTOs, XML comments, validation, etc.)
 
 Following these guidelines helps keep the codebase consistent and maintainable.
 
@@ -19,11 +20,34 @@ Following these guidelines helps keep the codebase consistent and maintainable.
 Clone the repository and open the solution file to begin.
 
 ## Project Layout
-- FoodAdviser.Api: Controllers, middleware, DI composition
-- FoodAdviser.Application: DTOs, mappings, validators
-- FoodAdviser.Domain: Entities, repository/service interfaces
-- FoodAdviser.Infrastructure: EF Core DbContext, repositories, DI
-- FoodAdviser.Api.Tests: Integration tests (to be expanded)
+
+### Src/FoodAdviser.Api
+- **Controllers**: AuthController, InventoryController, ReceiptsController, RecipesController
+- **DTOs**: Request/response models for all API endpoints
+- **Extensions**: Service registration, options validation, application configuration
+- **Validators**: FluentValidation validators for requests
+- **Mapping**: AutoMapper profiles for API-level mappings
+
+### Src/FoodAdviser.Application
+- **Services**: InventoryService, ReceiptService, RecipeSuggestionService
+- **DTOs**: Application-layer data transfer objects
+- **Options**: Configuration classes (AiProviderOptions, JwtOptions, OpenAiOptions, ReceiptAnalyzerOptions, RecipeSuggestionOptions, StorageOptions)
+- **Mapping**: AutoMapper profiles for domain↔DTO conversions
+
+### Src/FoodAdviser.Domain
+- **Entities**: ApplicationUser, ApplicationRole, FoodItem, Receipt, Recipe, RefreshToken
+- **Repositories**: Repository interfaces (IFoodItemRepository, IReceiptRepository, IRecipeRepository, IRefreshTokenRepository)
+- **Enums**: Domain enumerations
+
+### Src/FoodAdviser.Infrastructure
+- **Persistence**: EF Core DbContext and migrations
+- **Repositories**: Repository implementations
+- **Services**: AuthService, JwtTokenService, CurrentUserService, OpenAiService, ReceiptAnalyzerService, AiRecipeServiceFactory
+- **DependencyInjection**: Infrastructure service registration
+
+### Tests
+- **FoodAdviser.Api.Tests**: Integration tests for controllers and services
+- **FoodAdviser.Infrastructure.Tests**: Unit tests for infrastructure services
 
 ## Run (Dev)
 
@@ -53,24 +77,37 @@ Install PostgreSQL 15+ locally and create a database with these credentials:
 - Host: localhost
 - Port: 5432
 - Database: foodadviser
-- Username: foodadviser
-- Password: foodadviser_dev_pw
+### Authentication
 
-### Running the Application
+The API uses JWT Bearer token authentication. All endpoints except `/api/Auth/register` and `/api/Auth/login` require authentication.
 
-```powershell
-cd "C:\AI training\FoodAdviser\backend\FoodAdviser.Api"
-dotnet run
-```
+To authenticate:
+1. Register or login to receive access and refresh tokens
+2. Include the access token in the `Authorization` header: `Bearer {token}`
+3. Use the refresh token to get new access tokens when they expire
 
-## API
+### Endpoints
 
-Base URLs (Development defaults from `FoodAdviser.Api/Properties/launchSettings.json`):
+#### Authentication (`/api/Auth`)
+- `POST /api/Auth/register` - Register a new user (anonymous)
+- `POST /api/Auth/login` - Login and receive tokens (anonymous)
+- `POST /api/Auth/refresh` - Refresh access token (anonymous)
+- `POST /api/Auth/logout` - Logout and invalidate refresh token (authenticated)
 
-- HTTP: `http://localhost:5288`
-- HTTPS: `https://localhost:7162`
+#### Inventory (`/api/Inventory`)
+- `GET /api/Inventory?page=1&pageSize=20` - Get paginated food items
+- `GET /api/Inventory/{id}` - Get a specific food item
+- `POST /api/Inventory` - Add a new food item
+- `PUT /api/Inventory/{id}` - Update a food item
+- `DELETE /api/Inventory/{id}` - Delete a food item
 
-Swagger UI (Development only):
+#### Receipts (`/api/Receipts`)
+- `POST /api/Receipts/upload` - Upload and analyze a receipt image
+- `GET /api/Receipts/recent` - Get recent receipts
+
+#### Recipes (`/api/Recipes`)
+- `POST /api/Recipes/generate` - Generate recipe suggestions based on available inventory
+- `POST /api/Recipes/confirm` - Confirm a recipe and deduct ingredients from inventory
 
 - `https://localhost:7162/swagger`
 
@@ -84,20 +121,59 @@ Endpoints:
   - `POST /api/Inventory`
   - `PUT /api/Inventory/{id}`
   - `DELETE /api/Inventory/{id}`
-
-- Receipts
-  - `POST /api/Receipts/upload`
-  - `GET /api/Receipts/recent`
-  - `POST /api/Receipts/analyze` (stub)
-
-- Recipes
-  - `POST /api/Recipes/generate`
-  - `POST /api/Recipes/confirm`
-  - `GET /api/Recipes/suggestions?max=10` (stub)
-
-## Configuration
+Configuration is managed through `appsettings.json` and `appsettings.Development.json`. All configuration sections are validated at startup.
 
 ### Database Connection
+- **Development**: Uses PostgreSQL (see connection string in `appsettings.Development.json`)
+- **Production**: Configure `ConnectionStrings:Default` in `appsettings.json` or environment variables
+
+Connection String Parameters:
+- Timeout: 30 seconds
+- CommandTimeout: 30 seconds
+- MaxPoolSize: 100
+- Retry on failure: 5 attempts with exponential backoff (max 10 seconds delay)
+
+### JWT Authentication (`Jwt` section)
+```json
+{
+  "SecretKey": "YourSecretKey",
+  "Issuer": "FoodAdviser.Api",
+  "Audience": "FoodAdviser.Client",
+  "ExpirationMinutes": 60,
+  "RefreshTokenExpirationDays": 7
+}
+```
+
+### OpenAI Integration (`OpenAi` section)
+```json
+{
+  "ApiKey": "your-openai-api-key",
+  "Model": "gpt-4",
+  "TimeoutSeconds": 600
+}
+```
+Used for generating recipe suggestions based on available ingredients.
+
+### Receipt Analyzer (`ReceiptAnalyzer` section)
+```json
+{
+  "ClientId": "your-client-id",
+  "Username": "your-username",
+  "ApiKey": "your-api-key",
+  "TimeoutSeconds": 30,
+  "RetryCount": 3,
+  "RetryDelayMs": 500
+}
+```
+Integrates with external receipt OCR service to extract product information from uploaded receipts.
+
+### Storage (`Storage` section)
+```json
+{
+  "ReceiptTempPath": "C:\\Temp\\FoodAdviser\\Receipts-Dev"
+}
+```
+Local directory for temporary receipt file storage. The application automatically creates this directory on startup.
 - **Development**: Uses PostgreSQL (see connection string in `appsettings.Development.json`)
 - **Production**: Configure `ConnectionStrings:Default` in `appsettings.json` or environment variables
 
